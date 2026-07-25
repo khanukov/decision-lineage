@@ -31,6 +31,8 @@ Every schema change needs a corresponding example that exercises it. CI validate
 
 **Every normative change needs a conformance case.** If a pull request adds, removes, or alters a *MUST* or *MUST NOT*, it adds or updates a fixture in `conformance/` and its manifest entry in the same change. A normative rule with no fixture is a rule nobody can be held to, and the suite is the only thing standing between "supports decision-lineage" and a claim that means something.
 
+**Changing a playbook question requires updating its lock.** `playbook/questions.yaml` is a fixed, numbered set, and its value comes entirely from ids meaning the same thing across assessments. Appending is free. Rewording or removing an existing question invalidates every comparison drawn from it, so `tools/playbook_lock.py --check` fails until you run `--update` in the same commit and say in the message what happens to assessments that already answered the old wording.
+
 Rules stated as *SHOULD* must **not** get conformance cases. An implementation that warns on a *SHOULD*, errors on it, or ignores it is equally conformant, so a fixture would fail correct implementations. Put *SHOULD* checks in `tools/validate.py` as warnings instead.
 
 ## Dogfooding
