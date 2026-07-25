@@ -99,3 +99,11 @@ Honest ones, so that a passing run is not read as more than it is.
 4. **Fixtures are minimal by design.** Each is thin so that exactly one rule is
    under test. They are not examples of well-written decision records; see
    [`examples/`](../examples/) for those.
+
+5. **Two normative rules are unenforceable by any validator**, and no fixture
+   can stand in for them. `origin_source` must name an organisation and never a
+   person (§3.3), and a record whose attestation is `none` must not be
+   *presented* as authoritative (§3.3). Both are constraints on what a producer
+   means and what a consumer displays, not on the bytes in the file. A
+   conformant implementation can still violate the intent of the specification
+   here, and a passing run does not say otherwise.

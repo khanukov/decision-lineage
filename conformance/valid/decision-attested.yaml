@@ -1,0 +1,13 @@
+# SPEC 3.3 -- a participant confirmed the reasoning, and who did is recorded.
+id: DL-9021
+title: Keep the legacy pricing table denormalised
+status: accepted
+decision: The denormalised pricing table stays until the pricing rewrite lands.
+origin: inherited
+origin_source: agency-west
+provenance:
+  extracted_from: transcript
+  extracted_at: 2026-06-02
+  attestation: participant_confirmed
+  attested_by: former-technical-lead-agency-west
+  confidence: 0.8

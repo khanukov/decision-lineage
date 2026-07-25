@@ -97,6 +97,14 @@ Producers *SHOULD* write only one direction; consumers *SHOULD* derive the inver
 
 **`outcomes`** (array of object) — what actually happened. Each entry has `date`, `observation` (string), and optional `matched_prediction` (boolean). This field is appended over time and is the only feedback mechanism in the specification.
 
+**`origin`** (enum) — whether the decision was made by the organisation holding the record, or inherited from elsewhere. Values are `own` and `inherited`. Absent means `own`.
+
+**`origin_source`** (string) — where an inherited decision came from. *MUST* be present when `origin` is `inherited`, and *MUST* identify an organisation, team, or acquired entity — **never a person**. `agency-north` is correct; a former engineer's name is not.
+
+The pair exists because a record set that mixes a group's own decisions with decisions absorbed from acquired or merged entities cannot answer the question that makes the set worth keeping: which of the things this system does were chosen deliberately by someone, and which arrived as an accident of history that nobody has yet examined. Without the distinction, an inherited accident is indistinguishable from a considered position, and integration work re-litigates the second while preserving the first.
+
+The prohibition on naming a person is the same rule as §4.3, applied to a different field. Attributing inherited decisions to individuals turns an integration record into a judgement of the people who were acquired, which is both a different activity and a worse one.
+
 **`provenance`** (object) — how the record itself came to exist:
 
 | Field | Type | Notes |
@@ -104,10 +112,24 @@ Producers *SHOULD* write only one direction; consumers *SHOULD* derive the inver
 | `extracted_from` | enum | `manual`, `adr`, `pull_request`, `issue`, `transcript`, `chat`, `other`. |
 | `extracted_at` | date | |
 | `extractor` | string | Tool or model identifier, where applicable. |
-| `reviewed_by_human` | boolean | *MUST* be present when `extracted_from` is not `manual`. |
-| `confidence` | number | 0–1. Only meaningful for automated extraction. |
+| `attestation` | enum | `none`, `record_reviewed`, `participant_confirmed`. See below. |
+| `attested_by` | string | Role or identity that performed the attestation. *MUST NOT* be present when `attestation` is `none`. Roles are recommended, as for `deciders`. |
+| `reviewed_by_human` | boolean | **Deprecated**, retained for compatibility. *MUST* be present when `extracted_from` is not `manual` and `attestation` is absent. |
+| `confidence` | number | 0–1. Confidence of the *extraction*, not of the decision. |
 
-**A record with `reviewed_by_human: false` *MUST NOT* be presented as an authoritative decision.** Unreviewed extractions are candidates. Conflating the two destroys trust in the whole log, which is the failure mode this specification exists to avoid.
+`attestation` records how much is actually known about whether the record is true:
+
+| Value | Meaning |
+|---|---|
+| `none` | Nobody has checked. The record is a candidate. |
+| `record_reviewed` | A human read the record and considered it a fair summary of the source material. |
+| `participant_confirmed` | Someone who took part in the decision confirmed the reasoning. |
+
+The distinction between the last two is not pedantry. Reviewing a record checks it against a document; confirming it checks it against what actually happened, and only a participant can do that. For decisions inherited through an acquisition the gap is at its widest, because the people who can confirm are frequently the people with an interest in how the decision is described — a founder under an earn-out has reason to present an accident as a strategy. `participant_confirmed` therefore records who confirmed, and is a claim about provenance, not a guarantee of accuracy.
+
+**A record whose `attestation` is `none` *MUST NOT* be presented as an authoritative decision.** Unreviewed extractions are candidates. Conflating the two destroys trust in the whole log, which is the failure mode this specification exists to avoid.
+
+Where `attestation` is absent, the deprecated `reviewed_by_human` determines the same rule: `false` is equivalent to `none`, and `true` is equivalent to `record_reviewed`. Producers *SHOULD* emit `attestation`. Consumers *MUST* accept either.
 
 ## 4. Signal
 
@@ -161,6 +183,14 @@ Consumers using signals as audit evidence *SHOULD* rely only on deterministic si
 **`severity`** (enum) — `info`, `low`, `medium`, `high`, `critical`.
 
 **`confidence`** (number, 0–1) — required in practice when `deterministic` is `false`.
+
+**`run`** (string) — identifier of the assessment pass that produced this signal. Signals sharing a `run` were produced together and are read together.
+
+**`baseline`** (string) — what the observation was compared against, where the signal is a comparison rather than a bare detection. A signal saying a repository has no branch protection is a detection; a signal saying it diverges from a defined standard is a comparison, and is not interpretable without knowing which standard.
+
+These two fields exist because detection is not always continuous. A signal stream from a permanently connected system needs neither: everything is compared against now, and `detected_at` orders it. An assessment performed as a discrete exercise — a periodic review, or due diligence on a system being taken over — produces a batch of signals that mean something as a set and very little individually, and needs to say which batch and against what.
+
+They are fields rather than a third top-level record type, deliberately. Grouping and comparison are properties of a signal, and introducing an Assessment entity to hold them would add a type to the model, a lifecycle to define, and a relation to maintain, in exchange for something two optional strings already express.
 
 **`relates_to`** (array of string) — Decision Record identifiers.
 

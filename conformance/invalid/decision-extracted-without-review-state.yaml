@@ -1,0 +1,10 @@
+# SPEC 3.3 -- an extracted record must say how much is known about it: either
+# attestation, or the deprecated reviewed_by_human. Silence would let an
+# unreviewed extraction pass as an ordinary decision.
+id: DL-9124
+title: Serve portfolio summaries from a read replica
+status: proposed
+provenance:
+  extracted_from: pull_request
+  extracted_at: 2026-05-01
+  confidence: 0.5

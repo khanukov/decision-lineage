@@ -151,6 +151,9 @@ The specification takes three positions:
 1. **The subject of a Signal is an asset, not a person.** There is no `subject.person` field. This is a deliberate omission, not an oversight.
 2. **`deciders` accepts roles as well as identities**, and roles are recommended. `head-of-platform` is more durable and less personal than a name.
 3. **Provenance is required where records are extracted from human communication.** If a record came from a meeting transcript, that is recorded, so that retention policies can treat the source and the derived record differently.
+4. **`origin_source` names an organisation, never a person.** A decision inherited through an acquisition is attributed to the entity it came from — `agency-north` — because attributing it to individuals turns an integration record into an assessment of the people who were acquired.
+
+There is one place a person may legitimately appear, and the distinction is worth stating because it is easy to read as inconsistency. `deciders` and `provenance.attested_by` may carry an identity; a Signal's `subject` may not. Accountability for a decision someone made, and observation of a person's behaviour, are different activities. The first is what a decision record is for. The second is what this specification refuses to represent. Roles are still recommended in both fields where a role will do.
 
 Implementers operating under GDPR or UK GDPR should read the UK ICO's [guidance on monitoring workers](https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/employment/monitoring-workers/) before connecting any source that touches employee data. A DPIA is likely mandatory. This specification does not constitute legal advice and does not make any processing lawful.
 

@@ -1,0 +1,68 @@
+# An inherited decision, recorded retrospectively during integration.
+# The point of the record is to establish that this was deliberate, so that
+# nobody spends a quarter rebuilding it as though it were an accident.
+id: DL-0021
+title: Model tenancies and landlords as one contact record with a role flag
+status: accepted
+date_decided: 2023-06-01
+review_by: 2026-10-01
+deciders: [former-technical-lead-agency-north]
+
+origin: inherited
+origin_source: agency-north
+
+scope:
+  services: [agency-north-crm]
+  repositories: [agency-north/crm]
+
+context: >
+  The agency's landlords were frequently also tenants elsewhere in the same
+  portfolio, and the team had been maintaining two records per person that drifted
+  apart. The rewrite that would have separated the concerns properly was priced at
+  more than a quarter, against a business of eleven people.
+
+decision: >
+  Landlords and tenants share one contact record, distinguished by a role flag.
+  A single person holding both roles is one record with both flags set.
+
+options:
+  - name: One contact record with a role flag
+    chosen: true
+  - name: Separate landlord and tenant entities with a link table
+    rejected_because: >
+      Correct, and priced at a quarter of engineering the business did not have.
+      The duplicate-record drift it would have fixed was costing support time, not
+      revenue.
+  - name: Keep two records and reconcile nightly
+    rejected_because: >
+      Reconciliation jobs were already the largest source of support escalations.
+
+consequences:
+  positive:
+    - One record per person; the drift that generated support tickets stopped.
+  negative:
+    - Role-specific fields are nullable on every contact.
+    - Permissions cannot be expressed per role without a join that does not exist.
+
+relations:
+  conflicts_with: [DL-0022]
+
+outcomes:
+  - date: 2026-05-14
+    observation: >
+      Integration onto the group platform found the permission limitation first;
+      the nullable fields have not caused a defect in three years.
+    matched_prediction: true
+
+controls:
+  - framework: iso27001:2022
+    control: A.8.3
+    relationship: weakens
+
+provenance:
+  extracted_from: transcript
+  extracted_at: 2026-05-20
+  extractor: manual notes from integration interview
+  attestation: participant_confirmed
+  attested_by: former-technical-lead-agency-north
+  confidence: 0.85
