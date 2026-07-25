@@ -62,17 +62,26 @@ Initial draft. Nothing here is stable.
   `attestation` is absent and the record was extracted. Removal awaits a major
   version. Equivalence: `false` means `none`, `true` means `record_reviewed`.
 
+### Fixed
+- INTEGRATIONS.md claimed the Backstage ADR plugin's custom-parser extension
+  point was a route to a native producer of this format. It is not:
+  `AdrInfoParser` returns `title`, `status` and `date` only, and is an input
+  parser, so it can make Backstage a consumer and never a producer. The section
+  now carries the real API, what a module built on it does and does not
+  preserve, and where it should live. Recorded in `decisions/DL-0007`.
+
 ### Open
 - OSCAL alignment undecided.
 - Open questions in SPEC.md §7.
 - Conformance suite does not cover §2.5; it needs a two-revision fixture format.
 - `origin_source` naming an organisation rather than a person is normative but
   unenforceable by schema; only its presence is checkable.
-- No *native producer*. Nothing outside this repository emits decision-lineage
-  records; the importer reads other formats, which is the opposite direction and
-  a weaker one. Backstage's ADR backend exposes an extension point for a custom
-  parser and is the most tractable target. This is the largest remaining gap and
-  it cannot be closed here.
+- No *native producer*, and no identified route to one. Nothing outside this
+  repository emits decision-lineage records; the importer reads other formats,
+  which is the opposite direction and a weaker one. Backstage's extension point
+  turned out to be an input parser; adr-tools and log4brains are authoring tools
+  whose output format is the thing they exist to define. This is the largest
+  remaining gap and it currently has no plan.
 - No consumer. Records validate and then sit in a directory; nothing renders the
   lineage graph or answers what is stale.
 - Not listed at adr.github.io/adr-tooling, which is where people look first.
