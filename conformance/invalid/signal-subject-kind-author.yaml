@@ -1,0 +1,9 @@
+# SPEC 4.3 -- the same rule under a different label. The permitted kinds are
+# enumerated precisely so that renaming a person does not create a loophole.
+id: SIG-9103
+type: knowledge_concentration
+detected_at: 2026-05-14T09:30:00Z
+deterministic: true
+subject:
+  kind: author
+  ref: j.smith

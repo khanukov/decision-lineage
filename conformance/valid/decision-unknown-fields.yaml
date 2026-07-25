@@ -1,0 +1,11 @@
+# SPEC 2.6 -- unrecognised fields MUST be ignored, not rejected. This is the
+# extension mechanism: an organisation adds its own fields without forking.
+id: DL-9004
+title: Use a message bus between the tenancy and billing domains
+status: accepted
+decision: Introduce an event bus rather than synchronous calls.
+internal_ticket: OPS-4471
+cost_centre: platform
+risk_register_entry:
+  ref: RR-88
+  reviewed: 2026-04-01

@@ -13,4 +13,29 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install pyyaml jsonschema
-      - run: python3 tools/validate.py
+      - name: Validate examples and decisions
+        run: python3 tools/validate.py
+
+  conformance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pyyaml jsonschema
+      - name: The reference implementation must be conformant
+        run: python3 tools/conformance.py
+
+  importer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pyyaml jsonschema
+      - name: Import the sample ADRs
+        run: python3 tools/adr_import.py examples/adr-samples --out "$RUNNER_TEMP/imported"
+      - name: Every imported record must validate
+        run: python3 tools/validate.py "$RUNNER_TEMP"/imported/*.yaml

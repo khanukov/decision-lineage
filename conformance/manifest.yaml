@@ -1,0 +1,208 @@
+# decision-lineage conformance suite
+#
+# Each case names one rule from SPEC.md and one expected outcome. An
+# implementation is conformant when it accepts every `accept` case and rejects
+# every `reject` case.
+#
+# Cases test normative rules only — MUST and MUST NOT. Rules stated as SHOULD
+# are deliberately absent: an implementation that warns on them, errors on them,
+# or ignores them is equally conformant, so they cannot be conformance cases.
+
+suite:
+  name: decision-lineage conformance suite
+  spec_version: "0.1.0-draft"
+  note: >
+    Fixtures are data, not examples of good practice. Several are deliberately
+    thin so that exactly one rule is under test.
+
+cases:
+
+  # ---------------------------------------------------------------- accept ---
+
+  - id: CF-A-001
+    file: valid/decision-minimal.yaml
+    expect: accept
+    rule: "3.1"
+    rationale: >
+      The required fields of a Decision Record are id, title and status. A
+      record carrying only those three is valid; every other field is optional.
+
+  - id: CF-A-002
+    file: valid/decision-accepted.yaml
+    expect: accept
+    rule: "3.1"
+    rationale: >
+      `decision` becomes required once status is accepted, and is present here.
+
+  - id: CF-A-003
+    file: valid/decision-superseded.yaml
+    expect: accept
+    rule: "3.2"
+    rationale: >
+      A superseded record carries the superseding identifier in
+      relations.superseded_by, which is what the lifecycle requires.
+
+  - id: CF-A-004
+    file: valid/decision-unknown-fields.yaml
+    expect: accept
+    rule: "2.6"
+    rationale: >
+      Consumers MUST ignore unrecognised fields rather than reject the record.
+      This is the extension mechanism that lets an organisation add its own
+      fields without forking the schema, so rejecting this record is a
+      conformance failure rather than strictness.
+
+  - id: CF-A-005
+    file: valid/decision-arbitrary-id.yaml
+    expect: accept
+    rule: "2.3"
+    rationale: >
+      The DL- prefix is a reference convention, not a requirement. Any stable
+      unique string is a valid identifier.
+
+  - id: CF-A-006
+    file: valid/decision-full.yaml
+    expect: accept
+    rule: "3.3"
+    rationale: >
+      Every optional field populated at once, including six of the seven
+      relation types, evidence, controls, outcomes and provenance. Catches
+      schemas that forbid combinations the specification permits. superseded_by
+      is exercised by CF-A-003 instead, because pairing it with an accepted
+      status would encode a record that claims to be both current and replaced.
+
+  - id: CF-A-007
+    file: valid/decision-extracted-unreviewed.yaml
+    expect: accept
+    rule: "3.3"
+    rationale: >
+      An extracted record that has not been reviewed by a human is valid data
+      and MUST validate. It MUST NOT be presented as authoritative, which is a
+      presentation rule an importer cannot enforce and a validator cannot test.
+
+  - id: CF-A-008
+    file: valid/signal-minimal.yaml
+    expect: accept
+    rule: "4.1"
+    rationale: >
+      The required fields of a Signal are id, type, detected_at, subject and
+      deterministic.
+
+  - id: CF-A-009
+    file: valid/signal-inferred-with-confidence.yaml
+    expect: accept
+    rule: "4.5"
+    rationale: >
+      A non-deterministic signal carrying confidence satisfies the conditional
+      requirement.
+
+  - id: CF-A-010
+    file: valid/signal-accepted-risk.yaml
+    expect: accept
+    rule: "4.5"
+    rationale: >
+      A disposition of accepted_risk with a linked Decision Record is the
+      closed-loop case: accepting a risk is itself a decision.
+
+  - id: CF-A-011
+    file: valid/signal-open-type.yaml
+    expect: accept
+    rule: "4.2"
+    rationale: >
+      The signal type list is open. An implementation MUST NOT reject a type it
+      does not recognise, or the vocabulary cannot grow.
+
+  # ---------------------------------------------------------------- reject ---
+
+  - id: CF-R-001
+    file: invalid/decision-missing-id.yaml
+    expect: reject
+    rule: "3.1"
+    rationale: "id is required."
+
+  - id: CF-R-002
+    file: invalid/decision-missing-title.yaml
+    expect: reject
+    rule: "3.1"
+    rationale: "title is required."
+
+  - id: CF-R-003
+    file: invalid/decision-unknown-status.yaml
+    expect: reject
+    rule: "3.1"
+    rationale: >
+      status is a closed enumeration. Unlike signal types, the lifecycle is not
+      extensible, because tooling branches on it.
+
+  - id: CF-R-004
+    file: invalid/decision-accepted-without-decision.yaml
+    expect: reject
+    rule: "3.1"
+    rationale: >
+      A record asserting status accepted while stating no decision is the
+      commonest way a decision log fills with placeholders.
+
+  - id: CF-R-005
+    file: invalid/decision-superseded-without-link.yaml
+    expect: reject
+    rule: "3.2"
+    rationale: >
+      A record MUST NOT be superseded without at least one entry in
+      relations.superseded_by. Without the link the lineage graph has a dead
+      end exactly where a reader most needs the next hop.
+
+  - id: CF-R-006
+    file: invalid/decision-two-chosen-options.yaml
+    expect: reject
+    rule: "3.3"
+    rationale: >
+      At most one option per record may be marked chosen. Two chosen options
+      describe two decisions.
+
+  - id: CF-R-007
+    file: invalid/signal-missing-detected-at.yaml
+    expect: reject
+    rule: "4.1"
+    rationale: "detected_at is required; a signal without a time is not an observation."
+
+  - id: CF-R-008
+    file: invalid/signal-subject-is-person.yaml
+    expect: reject
+    rule: "4.3"
+    rationale: >
+      The subject of a signal MUST NOT be a person. This is the load-bearing
+      constraint of the whole specification: it is what separates a system that
+      finds risk in assets from a system that scores employees. An
+      implementation that accepts this fixture is not conformant, however well
+      it handles everything else.
+
+  - id: CF-R-009
+    file: invalid/signal-subject-kind-author.yaml
+    expect: reject
+    rule: "4.3"
+    rationale: >
+      The same rule under a different label. `author`, `developer`, `owner` and
+      `user` are people wearing a noun, and the permitted kinds are enumerated
+      precisely so that renaming does not create a loophole.
+
+  - id: CF-R-010
+    file: invalid/signal-inferred-without-confidence.yaml
+    expect: reject
+    rule: "4.5"
+    rationale: >
+      A model-derived signal without a confidence value cannot be weighed
+      against a deterministic one, and the two must never be merged silently.
+
+  - id: CF-R-011
+    file: invalid/signal-missing-subject.yaml
+    expect: reject
+    rule: "4.1"
+    rationale: "subject is required; a signal about nothing has no disposition."
+
+  - id: CF-R-012
+    file: invalid/signal-unknown-disposition.yaml
+    expect: reject
+    rule: "4.5"
+    rationale: >
+      disposition.state is a closed enumeration because it drives whether a
+      signal is still outstanding.

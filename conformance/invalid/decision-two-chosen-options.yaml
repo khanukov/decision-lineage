@@ -1,0 +1,10 @@
+# SPEC 3.3 -- at most one option may be marked chosen; two describe two decisions.
+id: DL-9105
+title: Select a log aggregation backend
+status: accepted
+decision: Route all logs to the managed aggregation service.
+options:
+  - name: Managed aggregation service
+    chosen: true
+  - name: Self-hosted aggregation cluster
+    chosen: true

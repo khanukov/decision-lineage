@@ -1,0 +1,9 @@
+# SPEC 4.5 -- a model-derived signal without confidence cannot be weighed
+# against a deterministic one.
+id: SIG-9104
+type: duplicate_effort
+detected_at: 2026-05-14T11:40:00Z
+deterministic: false
+subject:
+  kind: work_item
+  ref: PLAT-2231

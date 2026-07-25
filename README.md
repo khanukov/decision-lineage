@@ -30,13 +30,35 @@ A specification with three parts:
 2. **Signal** — a machine-detected observation about a system (a bypassed review, an architectural violation, a knowledge concentration risk) that can be linked to decisions and to controls.
 3. **Mappings** — optional, versioned files translating signal types into control frameworks. `mappings/iso27001-2022.yaml` is the first.
 
-Plus JSON Schemas, examples, and a validator.
+Plus JSON Schemas, examples, a validator, an importer for existing ADRs, and a conformance suite.
+
+## Try it on ADRs you already have
+
+The claim above — that decisions can be extracted rather than authored — should cost you one command to check, not a change of practice:
+
+```bash
+pip install pyyaml jsonschema
+python3 tools/adr_import.py path/to/your/doc/adr --report
+```
+
+That reads Nygard, MADR 2.x and MADR 3.x/4.x ADRs as they are, and prints what it could extract from each and how confident it is. Add `--out records/` to write Decision Records.
+
+Imported records always validate, and always carry `provenance.reviewed_by_human: false`. They are candidates, not decisions, until someone curates them — see [SPEC.md](SPEC.md) §3.3. Where a source cannot support a claim the importer weakens the claim rather than emitting an invalid record: an ADR marked accepted whose decision text cannot be located is imported as `proposed`, and one marked superseded with no traceable successor is imported as `deprecated`, both with a warning.
+
+## Checking an implementation
+
+```bash
+python3 tools/conformance.py                                  # the reference validator
+python3 tools/conformance.py --command "myimpl check {file}"  # yours
+```
+
+The runner reads only the exit status, so an implementation in any language is testable without modification. See [`conformance/`](conformance/) for what is covered and what is not.
 
 ## What this is not
 
 Being explicit, because the surrounding space is full of overclaiming:
 
-- **Not a tool.** There is no implementation in this repository. It is a format and a data model.
+- **Not a product.** The code here is a validator, an ADR importer, and a conformance runner — tooling that exists to make the format checkable and enterable. Nothing here stores records, serves them, queries them, or shows them to anyone. A system that does those things is an implementation, and belongs in its own repository.
 - **Not a productivity measurement system.** The schema is deliberately built so that the subject of a signal is an asset — a repository, a service, a module — and not a person. See [Privacy stance](#privacy-stance).
 - **Not a compliance product.** The ISO mapping is a starting point for discussion with an auditor, not a Statement of Applicability. See the disclaimer in the mapping file.
 - **Not an "AI CTO."** Nothing here makes decisions or evaluates whether a decision was correct. It records decisions, tracks whether they are still honoured, and links them to consequences. Judging strategy remains a human problem.

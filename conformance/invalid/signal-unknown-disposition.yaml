@@ -1,0 +1,11 @@
+# SPEC 4.5 -- disposition.state is closed; it drives whether a signal is
+# still outstanding.
+id: SIG-9106
+type: secret_exposed
+detected_at: 2026-05-14T13:20:00Z
+deterministic: true
+subject:
+  kind: repository
+  ref: platform/billing
+disposition:
+  state: probably-fine

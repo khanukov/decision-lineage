@@ -1,0 +1,5 @@
+# SPEC 4.1 -- subject is required; a signal about nothing has no disposition.
+id: SIG-9105
+type: config_drift
+detected_at: 2026-05-14T12:00:00Z
+deterministic: true

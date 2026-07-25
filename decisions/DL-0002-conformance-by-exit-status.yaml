@@ -1,0 +1,76 @@
+# Dogfooding: decisions about this specification use this specification.
+id: DL-0002
+title: Test conformance through an implementation's exit status, not its internals
+status: accepted
+date_decided: 2026-07-25
+review_by: 2027-01-25
+deciders: [maintainer]
+
+scope:
+  repositories: [decision-lineage]
+
+context: >
+  SPEC.md defined conformance and then admitted there was no way to check it.
+  An unverifiable definition is worse than none: it invites "supports
+  decision-lineage" as a marketing line while leaving adopters unable to tell
+  whether two tools will actually interoperate. The specification is also
+  intended to be implemented in languages other than the one the reference
+  validator happens to be written in, so any check that runs inside the
+  reference implementation would test the wrong thing.
+
+decision: >
+  Ship a corpus of fixtures with a manifest binding each to a normative rule,
+  and a runner that invokes an arbitrary command per fixture and reads only the
+  process exit status. Zero means the record was accepted, non-zero means it was
+  rejected. Cover MUST and MUST NOT rules only.
+
+options:
+  - name: Fixture corpus driven by exit status
+    chosen: true
+  - name: A test suite in the reference implementation's language
+    rejected_because: >
+      It would test the reference validator rather than the specification, and
+      an implementation in another language could not run it. Conformance would
+      become a property of one codebase.
+  - name: A prose conformance checklist
+    rejected_because: >
+      Not mechanically checkable, which is the entire problem being solved. A
+      checklist produces claims, not evidence.
+  - name: Cover SHOULD rules as well as MUST
+    rejected_because: >
+      An implementation that warns on a SHOULD, errors on it, or ignores it is
+      equally conformant. Testing them would fail implementations that are
+      correct, and the suite would be rejected as wrong rather than adopted.
+  - name: Ship no suite
+    rejected_because: >
+      Leaves every conformance claim unverifiable and gives a vendor no way to
+      demonstrate interoperability, which is the precondition for anyone
+      building on the format.
+
+consequences:
+  positive:
+    - A conformance claim becomes a publishable, reproducible artefact.
+    - Implementations in any language are testable without modification.
+    - Normative rules acquire a fixture, so vague MUSTs get caught while writing them.
+  negative:
+    - Exit status carries no diagnosis, so a failing case says what broke and not why.
+    - The corpus must be extended with every normative rule added to the specification, and will rot if it is not.
+    - Rules about how a corpus changes over time, such as 2.5, remain untestable in this design.
+
+relations:
+  constrained_by: [DL-0001]
+
+evidence:
+  paths:
+    - conformance/
+    - tools/conformance.py
+    - .github/workflows/validate.yml
+
+controls:
+  - framework: iso27001:2022
+    control: A.8.29
+    relationship: relates_to
+
+provenance:
+  extracted_from: manual
+  extracted_at: 2026-07-25

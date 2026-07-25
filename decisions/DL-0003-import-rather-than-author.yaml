@@ -1,0 +1,65 @@
+# Dogfooding: decisions about this specification use this specification.
+id: DL-0003
+title: Enter the format by importing existing ADRs rather than by authoring records
+status: accepted
+date_decided: 2026-07-25
+review_by: 2027-01-25
+deciders: [maintainer]
+
+scope:
+  repositories: [decision-lineage]
+
+context: >
+  README.md asserts that decisions can be extracted rather than authored, and
+  cites the research that says authoring is the reason thirty years of design
+  rationale tooling went unused. The repository asserted this and shipped no way
+  to do it, which left the first step of adoption as "write records by hand" —
+  the exact behaviour the specification argues does not work. A team evaluating
+  the format also has to commit to a practice before seeing anything, and that
+  ordering is what kills evaluation.
+
+decision: >
+  Ship a converter that reads a team's existing ADR directory in the dialects
+  they already use — Nygard, MADR 2.x, MADR 3.x and 4.x — and emits Decision
+  Records. Trying the model requires no change to how anyone works.
+
+options:
+  - name: Importer over existing ADR dialects
+    chosen: true
+  - name: An authoring tool or template generator
+    rejected_because: >
+      Adds capture cost upstream, which is the failure mode the specification
+      exists to avoid. It would also compete with adr-tools and log4brains while
+      being worse than both.
+  - name: An extractor that mines decisions from git history and pull requests
+    rejected_because: >
+      Higher value and a much larger surface. It needs judgement about what
+      constitutes a decision, so it belongs in a separate implementation
+      repository rather than alongside the specification. Deferred, not rejected
+      on merit.
+  - name: Nothing, and let adopters write their own converters
+    rejected_because: >
+      Every adopter would map ADR statuses to the lifecycle slightly
+      differently, and the resulting records would disagree while all validating.
+
+consequences:
+  positive:
+    - Evaluating the format costs one command against a directory that already exists.
+    - The claim that extraction is viable becomes demonstrable rather than asserted.
+    - Import exercises the schema against real-world ADRs, which is where a format finds its gaps.
+  negative:
+    - Parsing prose is heuristic, and dialects that deviate will import poorly.
+    - Imported records are unreviewed candidates, so a corpus can fill with plausible but uncurated reasoning if the provenance flag is ignored.
+    - The repository now carries code whose maintenance is not shared with the specification.
+
+relations:
+  constrained_by: [DL-0001]
+
+evidence:
+  paths:
+    - tools/adr_import.py
+    - examples/adr-samples/
+
+provenance:
+  extracted_from: manual
+  extracted_at: 2026-07-25

@@ -1,0 +1,7 @@
+# SPEC 4.1 -- detected_at is required; an observation without a time is not one.
+id: SIG-9101
+type: review_bypass
+deterministic: true
+subject:
+  kind: repository
+  ref: platform/tenancy

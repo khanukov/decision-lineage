@@ -1,0 +1,5 @@
+# SPEC 2.3 -- the DL- prefix is a convention. Any stable unique string is valid.
+id: arch/2026/storage-engine
+title: Select the storage engine for the tenancy ledger
+status: accepted
+decision: Use the relational engine already operated by the platform team.

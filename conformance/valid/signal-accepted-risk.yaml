@@ -1,0 +1,15 @@
+# SPEC 4.5 -- accepting a risk is itself a decision, and the link records it.
+id: SIG-9003
+type: privilege_change
+detected_at: 2026-05-02T08:00:00Z
+deterministic: true
+severity: medium
+subject:
+  kind: resource
+  ref: identity/acquired-agency-north
+relates_to: [DL-0011]
+disposition:
+  state: accepted_risk
+  owner: head-of-it-ops-security
+  due: 2026-08-01
+  note: Time-boxed exception recorded in DL-0011.

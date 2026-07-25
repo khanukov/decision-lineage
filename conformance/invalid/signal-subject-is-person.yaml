@@ -1,0 +1,10 @@
+# SPEC 4.3 -- the subject of a signal MUST NOT be a person.
+# This is the load-bearing constraint of the specification. An implementation
+# that accepts this fixture is not conformant, whatever else it does well.
+id: SIG-9102
+type: review_bypass
+detected_at: 2026-05-14T09:12:00Z
+deterministic: true
+subject:
+  kind: person
+  ref: j.smith

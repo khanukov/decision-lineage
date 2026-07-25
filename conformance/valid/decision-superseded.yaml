@@ -1,0 +1,6 @@
+# SPEC 3.2 -- a superseded record carries the superseding identifier.
+id: DL-9003
+title: Store all timestamps as local time with an offset column
+status: superseded
+relations:
+  superseded_by: [DL-9002]

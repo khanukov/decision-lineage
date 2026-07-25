@@ -1,0 +1,4 @@
+# SPEC 3.1 -- title is required.
+id: DL-9101
+status: accepted
+decision: All services emit JSON logs with a shared field set.
