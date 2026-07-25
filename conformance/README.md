@@ -76,10 +76,20 @@ decision-lineage" on a feature page is not.
 
 Honest ones, so that a passing run is not read as more than it is.
 
-1. **Coverage is of normative rules, not of the model.** §2.5 (accepted records
-   are immutable in their reasoning) is a rule about how a corpus changes over
-   time and cannot be tested by validating a single file. It needs a
-   two-revision fixture and a diffing runner, which do not exist yet.
+1. **Coverage is of normative rules, not of the model.** §2.5 — accepted records
+   keep their reasoning — is absent for two reasons, and an earlier version of
+   this file named only the first. It is a property of how a corpus changes
+   across revisions, so no single-file fixture can express it. It is also a
+   *SHOULD NOT* rather than a *MUST NOT*, deliberately, because a record
+   accepted with a genuine error in its reasoning is better corrected than
+   preserved. By the rule stated above, that alone disqualifies it: an
+   implementation that permits such an edit is conformant.
+
+   It is checked instead by `tools/history_check.py`, which reads git history
+   and reports where an accepted record's `decision`, `context` or `options`
+   changed in place. That is a lint over a repository rather than a conformance
+   test, and it reports rather than fails, which is the correct treatment for a
+   *SHOULD*.
 
 2. **The reference validator's record-type discrimination is heuristic**, and
    this suite works around it rather than exposing it. `tools/validate.py`

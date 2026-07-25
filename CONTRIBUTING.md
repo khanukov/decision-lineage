@@ -39,6 +39,8 @@ Rules stated as *SHOULD* must **not** get conformance cases. An implementation t
 
 Decisions about this specification live in `decisions/`, in the format this specification defines. If you propose a change to the model, the accompanying decision record is the argument.
 
+Accepted records keep their reasoning. Correct an error freely; to change a position, write a new record that supersedes the old one. `tools/history_check.py` reads git history and reports in-place edits to an accepted record's `decision`, `context` or `options`, so a pull request that rewrites one is visible in review rather than only to whoever wrote it. It reports and does not fail: some of those edits are corrections, and the point is that a human decides which.
+
 ## Tone
 
 Technical disagreement is welcome and expected. See [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) for the rest.

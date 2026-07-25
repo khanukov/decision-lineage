@@ -41,6 +41,10 @@ Initial draft. Nothing here is stable.
 - `tools/playbook_lock.py`: fails CI when an existing question's wording changes
   or an id disappears, since either silently invalidates comparisons drawn
   across assessments. Appending questions stays free.
+- `tools/history_check.py`: reads git history and reports where an accepted
+  record's `decision`, `context` or `options` were edited in place (SPEC 2.5).
+  Reports rather than fails, because the rule is a SHOULD NOT and correcting a
+  genuine error is expected.
 
 ### Changed
 - SPEC.md §6 now defines how conformance is checked and what it does not cover.
