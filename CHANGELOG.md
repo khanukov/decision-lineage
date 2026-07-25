@@ -32,6 +32,10 @@ Initial draft. Nothing here is stable.
 - `CODE_OF_CONDUCT.md`, adopting Contributor Covenant 2.1 by reference.
 - `tools/adr_import.py --origin inherited --origin-source`, for importing the
   ADRs of an organisation being acquired or a system being taken over.
+- `action.yml`: a composite GitHub Action covering validation, ADR import and
+  conformance, so none of it requires cloning this repository.
+- `INTEGRATIONS.md`: wiring for adr-tools, log4brains, Backstage, pre-commit and
+  CI, and an explicit account of which direction each integration runs in.
 
 ### Changed
 - SPEC.md §6 now defines how conformance is checked and what it does not cover.
@@ -55,6 +59,12 @@ Initial draft. Nothing here is stable.
 - Conformance suite does not cover §2.5; it needs a two-revision fixture format.
 - `origin_source` naming an organisation rather than a person is normative but
   unenforceable by schema; only its presence is checkable.
-- No integration yet with the ADR tooling teams already run (adr-tools,
-  log4brains, the Backstage ADR plugin). Adoption arrives through tools people
-  already use, so this is the largest remaining gap.
+- No *native producer*. Nothing outside this repository emits decision-lineage
+  records; the importer reads other formats, which is the opposite direction and
+  a weaker one. Backstage's ADR backend exposes an extension point for a custom
+  parser and is the most tractable target. This is the largest remaining gap and
+  it cannot be closed here.
+- No consumer. Records validate and then sit in a directory; nothing renders the
+  lineage graph or answers what is stale.
+- Not listed at adr.github.io/adr-tooling, which is where people look first.
+- No tagged release, so `uses: khanukov/decision-lineage@main` cannot be pinned.
