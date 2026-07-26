@@ -45,6 +45,12 @@ Initial draft. Nothing here is stable.
   record's `decision`, `context` or `options` were edited in place (SPEC 2.5).
   Reports rather than fails, because the rule is a SHOULD NOT and correcting a
   genuine error is expected.
+- `tools/lineage.py`: answers the five questions README says a directory of ADRs
+  cannot — transitive dependencies, staleness, resulting code, predictions
+  against outcomes, controls implemented or weakened — plus the inherited
+  library the playbook depends on. Derives inverse relations per SPEC 3.3, and
+  refuses to run on a corpus with duplicate identifiers rather than resolving a
+  relation to whichever record loaded first.
 
 ### Changed
 - SPEC.md §6 now defines how conformance is checked and what it does not cover.

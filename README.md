@@ -22,6 +22,16 @@ Architecture Decision Records (ADRs) are the one format that partially survived,
 
 `decision-lineage` is an attempt to specify the smallest data model that can answer those questions, and to make it machine-readable so that records can be **extracted** rather than authored.
 
+`tools/lineage.py` answers them over a corpus, so the claim above is checkable rather than rhetorical:
+
+```bash
+python3 tools/lineage.py --depends-on DL-0007   # what it silently rests on
+python3 tools/lineage.py --stale                # what expired while nobody looked
+python3 tools/lineage.py --predictions          # did what we predicted happen
+python3 tools/lineage.py --controls             # what we knowingly weakened
+python3 tools/lineage.py --inherited            # what we absorbed, and from whom
+```
+
 ## What this is
 
 A specification with three parts:

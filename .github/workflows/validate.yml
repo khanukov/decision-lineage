@@ -50,6 +50,10 @@ jobs:
       - run: pip install pyyaml
       - name: Report in-place edits to accepted reasoning (SPEC 2.5)
         run: python3 tools/history_check.py
+      - name: The corpus must answer the questions README claims it answers
+        run: |
+          python3 tools/lineage.py
+          python3 tools/lineage.py --path examples --controls
 
   importer:
     runs-on: ubuntu-latest
