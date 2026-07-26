@@ -257,7 +257,7 @@ The suite covers normative rules only. A *SHOULD* cannot be a conformance case, 
 
 An implementation claiming conformance *SHOULD* publish the output of a suite run, naming the specification version it was run against. An unqualified claim of support is not verifiable.
 
-## 7. Open questions
+## 7. Questions this draft has answered
 
 The five questions this section opened with are now answered, each in a decision record. They are kept here with their answers rather than deleted, because a question that turned out to have a boring answer is worth as much to the next reader as one that did not.
 
@@ -271,8 +271,20 @@ The five questions this section opened with are now answered, each in a decision
 
 5. **Should `scope` support negative scoping?** Deferred, with no evidence either way. Resolved in `decisions/DL-0012`.
 
-New questions are tracked in the issue tracker. The ones known to be open:
+## 8. Open questions
 
-- No implementation outside this repository emits these records, and no candidate producer has been identified.
-- `origin_source` naming an organisation rather than a person is normative and unenforceable by any schema.
-- Whether `attestation` needs a fourth value between `record_reviewed` and `participant_confirmed`, for a participant who confirmed but was not the decider.
+Answered questions belong in §7. These are the live ones, and they are the most useful thing to argue with. A draft that has answered everything is not finished, it is untested — every answer above was reached by one person reasoning about a corpus that same person wrote.
+
+1. **Does the two-entity model survive contact with a real corpus?** Decision and Signal were chosen because they were the smallest pair that covered the cases in front of us. Nobody has yet imported an organisation's actual decision history and found what does not fit. The first person to try is the most valuable contributor this specification can have.
+
+2. **Should `counterpart` have been a third entity after all?** §4.3 argues that a relational observation is a property of a signal. The counter-argument is that a relationship with its own disposition, owner and lifecycle is an entity wearing a field, and that `counterpart` is where that becomes visible.
+
+3. **Does `attestation` need a fourth value?** Between `record_reviewed` and `participant_confirmed` sits the case of someone who was present but did not decide. Whether that distinction pays for the complexity is unknown.
+
+4. **Is `outcomes` still too thin?** It now pairs an observation with the prediction it judges, which was a real fix. It still cannot express partial outcomes, outcomes that reversed later, or a prediction that was right for the wrong reason.
+
+5. **Does the playbook belong here?** `decisions/DL-0006` argues yes, and lists the reasons it might not. A reader who thinks a specification repository should not carry a methodology is disagreeing with a decision that was made under uncertainty and is recorded as such.
+
+6. **Is there any route to a native producer?** Nothing outside this repository emits these records. `decisions/DL-0007` withdrew the one candidate that had been named. This is the gap that decides whether the format matters, and it has no plan.
+
+7. **Are three unenforceable normative rules two too many?** `origin_source` naming an organisation rather than a person, a candidate record not being *presented* as authoritative, and the language policy are all normative and all uncheckable by any validator. Each is defensible alone. Whether a specification should state rules it cannot check is a question about what specifications are for.
