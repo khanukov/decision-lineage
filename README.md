@@ -215,7 +215,7 @@ The most useful contributions right now are not code. They are:
 - A field that is specified here and would never be filled in practice.
 - A disagreement with the ISO mapping from anyone who has been through a certification audit.
 
-See [CONTRIBUTING.md](CONTRIBUTING.md). Governance is described in [GOVERNANCE.md](GOVERNANCE.md) and is currently honest about being one person.
+See [CONTRIBUTING.md](CONTRIBUTING.md). Everything here is written in English, enforced in CI — see `decisions/DL-0013`. Governance is described in [GOVERNANCE.md](GOVERNANCE.md) and is currently honest about being one person.
 
 ## License
 

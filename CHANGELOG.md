@@ -30,6 +30,11 @@ Initial draft. Nothing here is stable.
 - Signal: `run` and `baseline`, for assessments performed as discrete exercises
   rather than continuous detection.
 - `CODE_OF_CONDUCT.md`, adopting Contributor Covenant 2.1 by reference.
+- `tools/check_language.py` and a CI job enforcing the English-only policy:
+  rejects non-Latin scripts and flags homoglyphs in file content, file names
+  and, on a pull request, commit messages. Recorded in `decisions/DL-0013`.
+- `CLAUDE.md`, conventions for automated agents working in this repository.
+- `docs/concept.md`, the design study this specification came out of.
 - `tools/adr_import.py --origin inherited --origin-source`, for importing the
   ADRs of an organisation being acquired or a system being taken over.
 - `action.yml`: a composite GitHub Action covering validation, ADR import and

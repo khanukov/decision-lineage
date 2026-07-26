@@ -1,0 +1,33 @@
+name: Language check
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  english-only:
+    name: English-only content
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Check repository content
+        run: python3 tools/check_language.py
+
+      - name: Check commit messages on this branch
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          git log --format='%s%n%b' "$BASE_SHA..$HEAD_SHA" > /tmp/commit-messages.txt
+          python3 tools/check_language.py /tmp/commit-messages.txt --root /tmp
