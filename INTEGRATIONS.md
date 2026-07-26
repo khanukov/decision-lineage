@@ -136,18 +136,73 @@ any other.
 The [ADR plugin](https://github.com/backstage/community-plugins/tree/main/workspaces/adr/plugins/adr)
 parses MADR 2.x and 3.x by default and surfaces ADRs against catalog entities.
 
-Two integration points exist, in increasing order of value and difficulty:
+An earlier version of this file claimed the plugin's custom-parser extension
+point was a route to making Backstage the first *native producer* of this
+format. Reading the actual type shows that was wrong, and the correction is
+worth more than the original claim.
 
-1. **Pull, today.** Point the importer at the same directories the plugin reads.
-   Decision records and the Backstage view coexist; neither knows about the
-   other.
+`adrExtensionPoint` from `@backstage-community/plugin-adr-backend` takes an
+`AdrInfoParser`:
 
-2. **Push, requiring Backstage-side work.** The ADR backend exposes an extension
-   point for registering a custom parser. A parser that emitted decision-lineage
-   records — rather than the plugin's internal shape — would make Backstage the
-   first native producer, and would give the catalog entity a decision graph
-   rather than a document list. This is the single highest-value integration
-   available and it cannot be written in this repository.
+```ts
+export const createCustomAdrParser = (): AdrInfoParser => {
+  return (content: string, dateFormat?: string) => {
+    return { title: adrTitle, status: adrStatus, date: adrDate };
+  };
+};
+```
+
+It returns `title`, `status` and `date`, and nothing else. It exists so the
+plugin can index and list documents, not so it can model them. It is an **input**
+parser, so it makes Backstage a consumer of a format, never a producer of one.
+
+That leaves two integrations, and the smaller one is more useful than it looks:
+
+1. **Backstage reads decision-lineage records — buildable today, by anyone.**
+   A backend module registering a parser for this format lets a team adopt
+   decision records without losing the ADR tab they already have. No Backstage
+   maintainer has to agree to anything: the extension point is public and the
+   module is ordinary npm.
+
+   ```ts
+   import { createBackendModule } from '@backstage/backend-plugin-api';
+   import { adrExtensionPoint } from '@backstage-community/plugin-adr-backend';
+
+   export default createBackendModule({
+     pluginId: 'adr',
+     moduleId: 'decision-lineage-parser',
+     register(reg) {
+       reg.registerInit({
+         deps: { extensionPoint: adrExtensionPoint },
+         async init({ extensionPoint }) {
+           extensionPoint.setAdrInfoParser((content: string) => {
+             const record = parseYaml(content);
+             return {
+               title: record.title,
+               status: record.status,
+               date: record.date_decided,
+             };
+           });
+         },
+       });
+     },
+   });
+   ```
+
+   What it buys: records are listed, searchable, and attached to catalog
+   entities. What it does not buy: the lineage graph. `relations`, `outcomes`,
+   `origin` and `attestation` all fall on the floor, because the parser has
+   nowhere to put them. A team gets a searchable list of decisions, which is
+   what the plugin gives MADR users too.
+
+   This module belongs in its own repository, not here. See `decisions/DL-0007`.
+
+2. **Backstage renders the lineage graph — requires Backstage-side work.**
+   A richer extension point, or a plugin of its own, that keeps the relations
+   instead of discarding them. This is what would make the format visibly worth
+   more than a directory of markdown, and it needs a conversation with the
+   plugin's maintainers rather than a pull request out of nowhere. Item 1
+   shipping first is what makes that conversation concrete.
 
 ## Listing
 
@@ -162,13 +217,26 @@ an entry is a pull request to that repository.
 
 Ordered by how much adoption each would unlock:
 
-1. **A native producer.** Any ADR tool emitting decision-lineage records
-   directly. Backstage's parser extension point is the most tractable target.
+1. **A native producer.** Any tool emitting decision-lineage records directly.
+   No candidate has been identified: Backstage's extension point turned out to
+   be an input parser, and adr-tools and log4brains are authoring tools whose
+   output format is the thing they exist to define. The honest position is that
+   this has no obvious route, and pretending otherwise wastes the reader's time.
 2. **A consumer worth pointing at.** Records validate and then sit in a
    directory. Nothing renders the graph, answers "what does this decision depend
-   on", or shows what is stale. A reference consumer belongs in a separate
-   repository, per `decisions/DL-0001`.
+   on", or shows what is stale. The Backstage module above is a partial answer
+   and discards the relations. A real consumer belongs in a separate repository,
+   per `decisions/DL-0001`.
 3. **A published package.** `pipx install decision-lineage` would make the tools
    usable without vendoring or a GitHub Action, and would make the pre-commit
    hook a three-line entry. Deferred deliberately; see `decisions/DL-0005`.
 4. **A listing on adr.github.io.** Cheap, and the first place anyone looks.
+   Draft entry, for a pull request to
+   [adr/madr-website](https://github.com/adr/adr.github.io):
+
+   > **decision-lineage** — an open specification for decision records with
+   > lineage: relations between decisions, an expiry date, recorded outcomes,
+   > provenance for extracted records, and optional links to control frameworks.
+   > Includes JSON Schemas, a conformance suite testable against any
+   > implementation, and an importer for existing Nygard and MADR ADRs.
+   > Apache 2.0. Status: draft, unstable.

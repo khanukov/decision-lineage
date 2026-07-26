@@ -1,0 +1,79 @@
+# Dogfooding: decisions about this specification use this specification.
+id: DL-0007
+title: Keep the Backstage module outside this repository, and stop claiming a native producer is close
+status: accepted
+date_decided: 2026-07-25
+review_by: 2027-01-25
+deciders: [maintainer]
+
+scope:
+  repositories: [decision-lineage]
+
+context: >
+  INTEGRATIONS.md named the Backstage ADR plugin's custom-parser extension point
+  as the most tractable route to a native producer of this format — a tool other
+  than this repository that emits decision records. Reading the actual type
+  showed that was wrong. `AdrInfoParser` takes document content and returns
+  `title`, `status` and `date`, and nothing else. It exists so the plugin can
+  index and list documents. It is an input parser, so a module registered
+  through it makes Backstage a consumer of a format and can never make it a
+  producer of one. That leaves a real but smaller integration — Backstage
+  listing and searching decision-lineage records — which is TypeScript, and
+  therefore an implementation, and therefore excluded from this repository by
+  DL-0001.
+
+decision: >
+  The Backstage module is specified in INTEGRATIONS.md and built in a separate
+  repository, published to npm under its own name. This repository keeps the
+  specification, the schemas, the conformance suite, the tooling that checks the
+  corpus, and the playbook. The claim that a native producer is within reach is
+  withdrawn: no candidate has been identified, and INTEGRATIONS.md now says so.
+
+options:
+  - name: Separate repository for the module, specification and design notes here
+    chosen: true
+  - name: Put the module in this repository under an integrations directory
+    rejected_because: >
+      A TypeScript package with its own dependency tree, release cadence and
+      Backstage version compatibility matrix is exactly the implementation
+      DL-0001 excluded. Tooling that checks the corpus has a defensible claim to
+      being part of a specification; a plugin for one vendor's developer portal
+      does not.
+  - name: Propose the module as a pull request to backstage/community-plugins
+    rejected_because: >
+      Their maintainers have no reason to carry a module for a format with no
+      adopters, and asking costs the credibility needed later for the larger
+      request. The module works as an independent package because the extension
+      point is public, so nobody's agreement is required to ship it.
+  - name: Ask Backstage for a richer extension point that preserves relations
+    rejected_because: >
+      Correct eventually and premature now. A request to widen an API is
+      answerable only when something concrete is losing data through the narrow
+      one, and shipping the module first is what produces that evidence.
+  - name: Leave the original claim in place
+    rejected_because: >
+      It was wrong, and a document about tracking decisions honestly cannot keep
+      an inaccurate claim about its own adoption prospects because the accurate
+      version is less encouraging.
+
+consequences:
+  positive:
+    - DL-0001 survives intact rather than eroding a third time.
+    - A module can ship without anyone's approval, since the extension point is public.
+    - The adoption picture is now accurate, which makes the remaining gaps addressable rather than reassuring.
+  negative:
+    - Two repositories to keep in step, for a project with one maintainer.
+    - The module discards relations, outcomes, origin and attestation, because the extension point has nowhere to put them; a team adopting it sees a searchable list, not a lineage graph.
+    - "There is now no identified route to a native producer at all, which is the honest position and also the weakest part of the adoption plan."
+
+relations:
+  constrained_by: [DL-0001]
+  depends_on: [DL-0005]
+
+evidence:
+  paths:
+    - INTEGRATIONS.md
+
+provenance:
+  extracted_from: manual
+  extracted_at: 2026-07-25
