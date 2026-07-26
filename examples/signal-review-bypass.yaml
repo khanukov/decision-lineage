@@ -1,0 +1,24 @@
+id: SIG-2026-07-19-0042
+type: review_bypass
+detected_at: "2026-07-19T14:02:11Z"
+deterministic: true
+severity: medium
+
+subject:
+  kind: repository
+  ref: platform/landlord-data
+
+relates_to: [DL-0004]
+
+controls:
+  - framework: iso27001:2022
+    control: A.8.32
+    relationship: relates_to
+
+disposition:
+  state: nonconformity
+  owner: head-of-platform
+  due: 2026-07-26
+  note: >
+    Branch protection was satisfied by a stale approval carried over after a
+    force push. Rule change required, not a conversation with the author.

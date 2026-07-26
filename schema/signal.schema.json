@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/khanukov/decision-lineage/schema/signal.schema.json",
+  "title": "Signal",
+  "description": "decision-lineage v0.1.0-draft",
+  "type": "object",
+  "required": ["id", "type", "detected_at", "subject", "deterministic"],
+  "additionalProperties": true,
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "type": { "type": "string", "minLength": 1 },
+    "detected_at": { "type": "string", "format": "date-time" },
+    "deterministic": { "type": "boolean" },
+    "severity": { "enum": ["info", "low", "medium", "high", "critical"] },
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+    "subject": {
+      "type": "object",
+      "required": ["kind", "ref"],
+      "additionalProperties": false,
+      "description": "The subject of a signal is an asset. A person is not a permitted subject.",
+      "properties": {
+        "kind": {
+          "enum": ["repository", "service", "module", "path", "pipeline", "resource", "work_item", "decision"]
+        },
+        "ref": { "type": "string", "minLength": 1 }
+      }
+    },
+    "relates_to": { "type": "array", "items": { "type": "string" } },
+    "controls": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["framework", "control"],
+        "properties": {
+          "framework": { "type": "string" },
+          "control": { "type": "string" },
+          "relationship": { "enum": ["implements", "weakens", "relates_to"] }
+        }
+      }
+    },
+    "disposition": {
+      "type": "object",
+      "required": ["state"],
+      "additionalProperties": false,
+      "properties": {
+        "state": { "enum": ["open", "nonconformity", "accepted_risk", "remediated", "false_positive"] },
+        "owner": { "type": "string" },
+        "due": { "type": "string", "format": "date" },
+        "note": { "type": "string" }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "deterministic": { "const": false } }, "required": ["deterministic"] },
+      "then": { "required": ["confidence"] }
+    }
+  ]
+}

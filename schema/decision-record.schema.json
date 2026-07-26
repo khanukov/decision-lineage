@@ -1,0 +1,143 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/khanukov/decision-lineage/schema/decision-record.schema.json",
+  "title": "Decision Record",
+  "description": "decision-lineage v0.1.0-draft",
+  "type": "object",
+  "required": ["id", "title", "status"],
+  "additionalProperties": true,
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "title": { "type": "string", "minLength": 1 },
+    "status": {
+      "enum": ["proposed", "accepted", "deprecated", "superseded", "rejected"]
+    },
+    "decision": { "type": "string" },
+    "date_decided": { "type": "string", "format": "date" },
+    "review_by": { "type": "string", "format": "date" },
+    "deciders": { "type": "array", "items": { "type": "string" } },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "services": { "type": "array", "items": { "type": "string" } },
+        "repositories": { "type": "array", "items": { "type": "string" } },
+        "teams": { "type": "array", "items": { "type": "string" } },
+        "environments": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "context": { "type": "string" },
+    "options": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": { "type": "string" },
+          "chosen": { "type": "boolean" },
+          "rejected_because": { "type": "string" }
+        }
+      }
+    },
+    "consequences": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "positive": { "type": "array", "items": { "type": "string" } },
+        "negative": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "relations": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "supersedes": { "type": "array", "items": { "type": "string" } },
+        "superseded_by": { "type": "array", "items": { "type": "string" } },
+        "depends_on": { "type": "array", "items": { "type": "string" } },
+        "enables": { "type": "array", "items": { "type": "string" } },
+        "constrains": { "type": "array", "items": { "type": "string" } },
+        "constrained_by": { "type": "array", "items": { "type": "string" } },
+        "conflicts_with": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "pull_requests": { "type": "array", "items": { "type": "string" } },
+        "commits": { "type": "array", "items": { "type": "string" } },
+        "paths": { "type": "array", "items": { "type": "string" } },
+        "urls": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "controls": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["framework", "control"],
+        "properties": {
+          "framework": { "type": "string" },
+          "control": { "type": "string" },
+          "relationship": { "enum": ["implements", "weakens", "relates_to"] }
+        }
+      }
+    },
+    "outcomes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["date", "observation"],
+        "properties": {
+          "date": { "type": "string", "format": "date" },
+          "observation": { "type": "string" },
+          "matched_prediction": { "type": "boolean" }
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["extracted_from"],
+      "properties": {
+        "extracted_from": {
+          "enum": ["manual", "adr", "pull_request", "issue", "transcript", "chat", "other"]
+        },
+        "extracted_at": { "type": "string", "format": "date" },
+        "extractor": { "type": "string" },
+        "reviewed_by_human": { "type": "boolean" },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "extracted_from": { "not": { "const": "manual" } }
+            },
+            "required": ["extracted_from"]
+          },
+          "then": { "required": ["reviewed_by_human"] }
+        }
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "status": { "const": "accepted" } }, "required": ["status"] },
+      "then": { "required": ["decision"] }
+    },
+    {
+      "if": { "properties": { "status": { "const": "superseded" } }, "required": ["status"] },
+      "then": {
+        "properties": {
+          "relations": {
+            "type": "object",
+            "required": ["superseded_by"],
+            "properties": {
+              "superseded_by": { "type": "array", "minItems": 1 }
+            }
+          }
+        },
+        "required": ["relations"]
+      }
+    }
+  ]
+}
