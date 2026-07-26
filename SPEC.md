@@ -235,7 +235,7 @@ python3 tools/conformance.py --command "myimpl check {file}"
 
 The suite covers normative rules only. A *SHOULD* cannot be a conformance case, because an implementation that warns, errors, or stays silent on it is equally conformant. Rules currently exercised: §2.3, §2.6, §3.1, §3.2, §3.3, §4.1, §4.2, §4.3, §4.5.
 
-§2.5 is *not* covered: immutability of accepted reasoning is a property of how a corpus changes across revisions, and cannot be tested by validating one file. See [`conformance/README.md`](conformance/README.md) for the remaining gaps.
+§2.5 is *not* covered, and cannot be: immutability of accepted reasoning is a property of how a corpus changes across revisions rather than of any single record, and it is a *SHOULD NOT* in any case. It is checked separately by `tools/history_check.py`, which reads git history and reports in-place edits to an accepted record's reasoning for a human to judge. See [`conformance/README.md`](conformance/README.md) for the remaining gaps.
 
 An implementation claiming conformance *SHOULD* publish the output of a suite run, naming the specification version it was run against. An unqualified claim of support is not verifiable.
 
