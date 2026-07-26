@@ -1,0 +1,49 @@
+# This repository uses its own format. This is the first record.
+id: DL-0001
+title: Publish decision-lineage as a specification rather than a tool
+status: accepted
+date_decided: 2026-07-25
+review_by: 2027-01-25
+deciders: [maintainer]
+
+scope:
+  repositories: [decision-lineage]
+
+context: >
+  The adjacent problem space already contains working products for individual
+  pieces: repository intelligence, architectural drift detection, developer
+  portals, compliance evidence automation. Shipping another product would
+  compete with funded vendors on execution while adding no new primitive.
+  What is missing across all of them is a shared way to represent an
+  engineering decision, its lineage, and its relationship to controls.
+
+decision: >
+  Publish a specification, JSON Schemas, examples, and a validator. Ship no
+  implementation in this repository. Any implementation lives elsewhere and is
+  one consumer of the specification among others.
+
+options:
+  - name: Specification only
+    chosen: true
+  - name: Specification plus reference implementation in the same repository
+    rejected_because: >
+      The implementation becomes the product and the specification becomes its
+      documentation. OpenLineage's separation of spec from integrations is the
+      counter-example worth copying.
+  - name: Open-source product
+    rejected_because: >
+      Competes directly with funded vendors on execution, requires ongoing
+      support burden, and offers no reason for those vendors to adopt the
+      shared model.
+
+consequences:
+  positive:
+    - Adoptable by existing tools without displacing them.
+    - Maintenance burden stays proportional to a document.
+  negative:
+    - Nothing runs, so nothing demonstrates value on day one.
+    - Adoption is slower and harder to measure than downloads.
+
+provenance:
+  extracted_from: manual
+  extracted_at: 2026-07-25

@@ -1,0 +1,167 @@
+# decision-lineage :: control mapping
+# Signal types -> ISO/IEC 27001:2022 Annex A controls
+
+framework:
+  id: iso27001
+  edition: "2022"
+  title: "ISO/IEC 27001:2022 — Information security management systems"
+  note: >
+    ISO/IEC 27001:2022 is the current edition (plus the 2024 climate amendment).
+    Annex A contains 93 controls in four themes: organizational (A.5, 37),
+    people (A.6, 8), physical (A.7, 14), technological (A.8, 34).
+    Certificates issued against the 2013 edition expired after 31 October 2025.
+
+disclaimer: >
+  THIS IS NOT A STATEMENT OF APPLICABILITY AND NOT AUDIT OR LEGAL ADVICE.
+  Annex A is a catalogue of reference controls from which an organisation
+  selects a subset justified by its own risk assessment and documented in its
+  own Statement of Applicability. A mapping authored by a third party cannot
+  determine applicability for your organisation, and an auditor may reasonably
+  reject any mapping here. Furthermore, an automatically produced artefact is
+  not by itself accepted evidence: auditors assess the process surrounding the
+  artefact — who reviews signals, how often, and what happens when one fires.
+  Signals with `deterministic: false` should not be used as evidence at all.
+
+mappings:
+
+  - signal_type: review_bypass
+    controls:
+      - id: A.8.32
+        name: Change management
+        evidence: >
+          Continuous record of whether changes passed the defined review
+          process, with an explicit, owned exception list.
+        strength: direct
+    notes: >
+      Strongest mapping in this file. A change-management control asserted in a
+      policy but contradicted by merge history is a finding waiting to happen.
+
+  - signal_type: history_rewrite
+    controls:
+      - id: A.8.32
+        name: Change management
+        evidence: Detection of force pushes to protected refs.
+        strength: direct
+      - id: A.8.15
+        name: Logging
+        evidence: Integrity of the change audit trail itself.
+        strength: partial
+
+  - signal_type: gate_disabled
+    controls:
+      - id: A.8.29
+        name: Security testing in development and acceptance
+        evidence: >
+          Time series of gate enablement, rather than a point-in-time
+          screenshot taken on the day of the audit.
+        strength: direct
+      - id: A.8.31
+        name: Separation of development, test and production environments
+        evidence: Promotion path integrity.
+        strength: indirect
+
+  - signal_type: rule_suppressed
+    controls:
+      - id: A.8.28
+        name: Secure coding
+        evidence: Register of suppressions with owner and expiry.
+        strength: direct
+
+  - signal_type: secret_exposed
+    controls:
+      - id: A.8.12
+        name: Data leakage prevention
+        evidence: Time to detection and time to remediation per incident.
+        strength: direct
+      - id: A.5.17
+        name: Authentication information
+        evidence: Handling of credentials outside approved stores.
+        strength: partial
+
+  - signal_type: privilege_change
+    controls:
+      - id: A.8.2
+        name: Privileged access rights
+        evidence: Audit trail of elevation events with justification.
+        strength: direct
+      - id: A.5.18
+        name: Access rights
+        evidence: Actual rather than declared access state.
+        strength: direct
+      - id: A.5.16
+        name: Identity management
+        evidence: Lifecycle of identities and their entitlements.
+        strength: partial
+
+  - signal_type: config_drift
+    controls:
+      - id: A.8.9
+        name: Configuration management
+        evidence: >
+          Divergence of deployed configuration from declared baseline.
+          A.8.9 is new in the 2022 edition.
+        strength: direct
+
+  - signal_type: architecture_violation
+    controls:
+      - id: A.8.27
+        name: Secure system architecture and engineering principles
+        evidence: >
+          Evidence that documented principles are enforced in practice, not
+          only published.
+        strength: direct
+      - id: A.8.26
+        name: Application security requirements
+        evidence: Traceability from requirement to enforced boundary.
+        strength: indirect
+
+  - signal_type: knowledge_concentration
+    controls:
+      - id: A.5.30
+        name: ICT readiness for business continuity
+        evidence: Dependency on key individuals expressed as a measured risk.
+        strength: partial
+    notes: >
+      Deliberately mapped as `partial`. A.5.30 concerns ICT continuity broadly;
+      bus factor is one input to it, not the control itself. Resist the
+      temptation to overstate this mapping — and note that this signal is
+      about assets, not about evaluating individuals.
+
+  - signal_type: shadow_dependency
+    controls:
+      - id: A.5.10
+        name: Acceptable use of information and other associated assets
+        evidence: Inventory of services actually in use versus approved.
+        strength: direct
+      - id: A.8.19
+        name: Installation of software on operational systems
+        evidence: Undeclared software and services in operational paths.
+        strength: partial
+      - id: A.5.23
+        name: Information security for use of cloud services
+        evidence: Cloud services in use outside the assessed set.
+        strength: direct
+
+  - signal_type: decision_undocumented
+    controls:
+      - id: A.8.27
+        name: Secure system architecture and engineering principles
+        evidence: Boundary-altering changes without recorded rationale.
+        strength: partial
+    notes: >
+      Also relates to clause 6.3 (Planning of changes), new in the 2022
+      edition, which is a management-system clause rather than an Annex A
+      control and therefore not listed above.
+
+  - signal_type: decision_stale
+    controls:
+      - id: A.5.1
+        name: Policies for information security
+        evidence: Review cycle of documented positions.
+        strength: indirect
+
+# Asset and ownership data derived from the decision graph itself
+# supports A.5.9 (Inventory of information and other associated assets)
+# and A.5.2 (Information security roles and responsibilities).
+# These are properties of the graph rather than of any single signal type,
+# and are therefore noted here rather than mapped above.

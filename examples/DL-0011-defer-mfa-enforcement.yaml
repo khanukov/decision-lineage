@@ -1,0 +1,51 @@
+# A decision that weakens a control. Recording these honestly is the point.
+id: DL-0011
+title: Defer MFA enforcement for acquired-agency staff accounts until migration
+status: accepted
+date_decided: 2026-05-02
+review_by: 2026-08-01
+deciders: [head-of-it-ops-security, cto]
+
+scope:
+  teams: [acquired-agency-north, acquired-agency-west]
+
+context: >
+  Both acquired agencies use shared mailbox accounts that predate the
+  acquisition and cannot enrol in MFA without breaking daily operations.
+  Full identity migration is scheduled but not complete.
+
+options:
+  - name: Defer enforcement with a hard expiry date and compensating controls
+    chosen: true
+  - name: Enforce immediately
+    rejected_because: >
+      Would lock out staff from live tenancy operations during the letting
+      peak, with a direct effect on landlords and tenants.
+  - name: Defer indefinitely pending migration
+    rejected_because: >
+      An open-ended exception is indistinguishable from having no control.
+
+decision: >
+  Grant a time-boxed MFA exception for the two named teams, expiring
+  2026-08-01, with IP restriction and session monitoring as compensating
+  controls. The exception does not renew without a new decision record.
+
+consequences:
+  negative:
+    - Named exception to the access-control baseline for two teams.
+    - Requires compensating IP restriction and session monitoring.
+
+relations:
+  depends_on: [DL-0008]
+
+controls:
+  - framework: iso27001:2022
+    control: A.5.17
+    relationship: weakens
+  - framework: iso27001:2022
+    control: A.8.2
+    relationship: weakens
+
+provenance:
+  extracted_from: manual
+  extracted_at: 2026-05-02

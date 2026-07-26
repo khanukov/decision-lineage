@@ -1,0 +1,70 @@
+# A decision extracted from a pull request and ratified in review.
+id: DL-0004
+title: PostgreSQL as the primary store for the landlord data service
+status: accepted
+date_decided: 2026-03-11
+review_by: 2027-03-11
+deciders: [head-of-platform, cto]
+
+scope:
+  services: [landlord-data-service]
+  repositories: [platform/landlord-data]
+
+context: >
+  Portfolio-centric preference scoping requires that a preference write and
+  the corresponding property_links write either both succeed or both fail.
+  The XOR constraint on property_links must be enforceable by the store
+  rather than by application code, because three separate ingestion paths
+  write to this table.
+
+options:
+  - name: PostgreSQL
+    chosen: true
+  - name: DynamoDB
+    rejected_because: >
+      Transactional guarantees do not cover the access pattern required.
+      The XOR constraint would move into application code, duplicated across
+      three ingestion paths.
+  - name: MongoDB
+    rejected_because: >
+      Multi-document transactions exist but the team has no operational
+      experience with them, and the constraint would remain advisory.
+
+decision: >
+  Use PostgreSQL as the primary store, with the XOR constraint on
+  property_links enforced as a table-level check constraint.
+
+consequences:
+  positive:
+    - Constraint enforcement moves to a single place.
+    - Existing operational knowledge applies.
+  negative:
+    - Vertical scaling ceiling accepted for the next 18 months.
+    - Cross-region replication becomes a later problem rather than a solved one.
+
+relations:
+  depends_on: [DL-0002]
+  constrains: [DL-0009]
+
+evidence:
+  pull_requests: ["platform/landlord-data#231"]
+  paths: ["migrations/0007_property_links.sql"]
+
+controls:
+  - framework: iso27001:2022
+    control: A.8.27
+    relationship: implements
+
+outcomes:
+  - date: 2026-06-20
+    observation: >
+      Two ingestion-path bugs that would have produced orphaned property_links
+      were rejected by the database constraint before reaching production.
+    matched_prediction: true
+
+provenance:
+  extracted_from: pull_request
+  extracted_at: 2026-03-12
+  extractor: "example-extractor/0.1"
+  reviewed_by_human: true
+  confidence: 0.91
