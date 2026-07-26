@@ -54,6 +54,19 @@ python3 tools/conformance.py --command "myimpl check {file}"  # yours
 
 The runner reads only the exit status, so an implementation in any language is testable without modification. See [`conformance/`](conformance/) for what is covered and what is not.
 
+## Running it where you already work
+
+All three commands are also a GitHub Action, so trying this costs four lines in a workflow rather than a clone:
+
+```yaml
+- uses: khanukov/decision-lineage@main
+  with:
+    mode: import
+    path: doc/adr
+```
+
+[INTEGRATIONS.md](INTEGRATIONS.md) covers adr-tools, log4brains, Backstage, pre-commit and CI — and is explicit about the direction each integration runs in. Everything that exists today reads formats other tools produce. No tool yet *emits* this format natively, which is the thing that would actually drive adoption, and it needs work in someone else's codebase rather than this one.
+
 ## What this is not
 
 Being explicit, because the surrounding space is full of overclaiming:

@@ -1,0 +1,120 @@
+name: decision-lineage
+description: >
+  Validate decision-lineage records, import existing ADRs, or run the conformance
+  suite against an implementation.
+author: decision-lineage contributors
+
+branding:
+  icon: git-commit
+  color: blue
+
+inputs:
+  mode:
+    description: "validate, import, or conformance"
+    required: false
+    default: validate
+  path:
+    description: >
+      validate: files or globs to check, default 'decisions/*.yaml'.
+      import: directory of ADRs to read, default 'doc/adr'.
+    required: false
+    default: ""
+  out:
+    description: "import only: directory to write records into"
+    required: false
+    default: ""
+  origin:
+    description: "import only: own or inherited"
+    required: false
+    default: ""
+  origin-source:
+    description: >
+      import only: organisation or team the decisions came from. Required with
+      origin=inherited. Never a person, see SPEC 3.3.
+    required: false
+    default: ""
+  id-prefix:
+    description: "import only: identifier prefix, default DL-"
+    required: false
+    default: "DL-"
+  command:
+    description: >
+      conformance only: command run per fixture, with {file} substituted. Runs
+      from the action's own directory, so use an absolute path or a command on
+      PATH. Defaults to this repository's reference validator.
+    required: false
+    default: ""
+  python-version:
+    description: "Python version to use"
+    required: false
+    default: "3.12"
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    - name: Install dependencies
+      shell: bash
+      run: pip install --quiet pyyaml jsonschema
+
+    - name: Validate records
+      if: inputs.mode == 'validate'
+      shell: bash
+      env:
+        TARGET: ${{ inputs.path }}
+      run: |
+        set -euo pipefail
+        targets="${TARGET:-decisions/*.yaml}"
+        # shellcheck disable=SC2086
+        files=$(ls -1 $targets 2>/dev/null || true)
+        if [ -z "$files" ]; then
+          echo "No records matched '$targets'."
+          echo "Set the 'path' input if your records live elsewhere."
+          exit 1
+        fi
+        # shellcheck disable=SC2086
+        python3 "${{ github.action_path }}/tools/validate.py" $targets
+
+    - name: Import ADRs
+      if: inputs.mode == 'import'
+      shell: bash
+      env:
+        SOURCE: ${{ inputs.path }}
+        OUT: ${{ inputs.out }}
+        ORIGIN: ${{ inputs.origin }}
+        ORIGIN_SOURCE: ${{ inputs.origin-source }}
+        ID_PREFIX: ${{ inputs.id-prefix }}
+      run: |
+        set -euo pipefail
+        source_dir="${SOURCE:-doc/adr}"
+        args=("$source_dir" --id-prefix "$ID_PREFIX")
+        if [ -n "$OUT" ]; then args+=(--out "$OUT"); else args+=(--report); fi
+        if [ -n "$ORIGIN" ]; then args+=(--origin "$ORIGIN"); fi
+        if [ -n "$ORIGIN_SOURCE" ]; then args+=(--origin-source "$ORIGIN_SOURCE"); fi
+        python3 "${{ github.action_path }}/tools/adr_import.py" "${args[@]}"
+
+    - name: Validate imported records
+      if: inputs.mode == 'import' && inputs.out != ''
+      shell: bash
+      env:
+        OUT: ${{ inputs.out }}
+      run: |
+        set -euo pipefail
+        python3 "${{ github.action_path }}/tools/validate.py" "$OUT"/*.yaml
+
+    - name: Run the conformance suite
+      if: inputs.mode == 'conformance'
+      shell: bash
+      env:
+        COMMAND: ${{ inputs.command }}
+      run: |
+        set -euo pipefail
+        if [ -n "$COMMAND" ]; then
+          python3 "${{ github.action_path }}/tools/conformance.py" --command "$COMMAND"
+        else
+          python3 "${{ github.action_path }}/tools/conformance.py"
+        fi

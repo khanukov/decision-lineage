@@ -1,0 +1,67 @@
+# Dogfooding: decisions about this specification use this specification.
+id: DL-0005
+title: Distribute the tooling as a GitHub Action, and defer publishing a package
+status: accepted
+date_decided: 2026-07-25
+review_by: 2026-11-25
+deciders: [maintainer]
+
+scope:
+  repositories: [decision-lineage]
+
+context: >
+  The specification has a conformance suite and an importer, and neither is
+  reachable without cloning this repository. Adoption of a format happens
+  through the tools a team already runs, so the question is which distribution
+  channel to occupy first. Publishing to a package registry claims a name
+  permanently and creates a support surface that a project with one maintainer
+  and no release has no way to honour, while a composite GitHub Action requires
+  no registry account, no name reservation, and no version of the tooling that
+  is separable from the specification it enforces.
+
+decision: >
+  Ship a composite GitHub Action at the repository root covering validation,
+  ADR import and conformance. Document a local pre-commit hook rather than a
+  packaged one. Do not publish to PyPI until there is a tagged release and at
+  least one user outside the maintainer's organisation.
+
+options:
+  - name: GitHub Action now, package later
+    chosen: true
+  - name: Publish to PyPI immediately
+    rejected_because: >
+      A package name is claimed permanently and implies a support commitment and
+      a release cadence, neither of which exists yet. It would also split the
+      tooling's version from the specification's, and the two are currently the
+      same thing.
+  - name: Both at once
+    rejected_because: >
+      Two channels to keep in step before either has a user. The second costs
+      little only once the first has shown which commands people actually run.
+  - name: Neither; expect users to clone the repository
+    rejected_because: >
+      Cloning a specification repository to run a script against your own is
+      friction at exactly the moment someone is deciding whether to bother.
+
+consequences:
+  positive:
+    - Trying the tooling costs four lines in a workflow file and nothing else.
+    - No name is claimed and no support promise is made before there is anything to support.
+    - The tooling stays versioned with the specification, which is currently correct.
+  negative:
+    - Teams not on GitHub Actions must vendor the scripts or clone the repository.
+    - The pre-commit hook is a local block to copy rather than a three-line reference.
+    - "`uses: khanukov/decision-lineage@main` is unpinnable until a tag exists, which is a supply-chain smell that only a release fixes."
+
+relations:
+  depends_on: [DL-0003]
+  constrained_by: [DL-0001]
+
+evidence:
+  paths:
+    - action.yml
+    - INTEGRATIONS.md
+
+provenance:
+  extracted_from: manual
+  extracted_at: 2026-07-25
