@@ -67,10 +67,13 @@ outcomes:
   - date: 2026-04-02
     observation: >
       Tenancy deploy frequency rose from weekly to daily within six weeks.
+    predicted: Tenancy releases no longer wait on billing.
     matched_prediction: true
   - date: 2026-05-20
     observation: >
       Cross-domain reporting took three weeks longer than estimated.
+    predicted: >-
+      Cross-domain reporting now requires joining across two stores.
     matched_prediction: false
 
 provenance:

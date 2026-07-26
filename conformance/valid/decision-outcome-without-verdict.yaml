@@ -1,0 +1,14 @@
+# SPEC 3.3 -- an outcome may be recorded with no verdict. Something can happen
+# that nobody predicted either way, and forcing a verdict manufactures one.
+id: DL-9030
+title: Move session storage to the shared cache
+status: accepted
+decision: Sessions move to the shared cache tier.
+consequences:
+  negative:
+    - Cache eviction now affects logged-in users.
+outcomes:
+  - date: 2026-06-30
+    observation: >
+      A cache upgrade caused a mass logout. Nobody had predicted this either
+      way, so no verdict is recorded against a prediction.

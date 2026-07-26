@@ -52,6 +52,8 @@ outcomes:
     observation: >
       Integration onto the group platform found the permission limitation first;
       the nullable fields have not caused a defect in three years.
+    predicted: >-
+      Permissions cannot be expressed per role without a join that does not exist.
     matched_prediction: true
 
 controls:

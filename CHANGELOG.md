@@ -63,6 +63,9 @@ Initial draft. Nothing here is stable.
   acquisitions each numbering their ADRs from one previously collided, which is
   the normal case for an acquiring group rather than an edge case. Own decisions
   still default to `DL-`; `--id-prefix` overrides either.
+- SPEC.md §2.5 now protects `consequences` alongside `decision`, `context` and
+  `options`. It holds predictions, and a prediction revised once its outcome is
+  known records nothing. `tools/history_check.py` watches it.
 - SPEC.md §6 now defines how conformance is checked and what it does not cover.
 - `decisions/DL-0001`, `DL-0002` and `DL-0003` carry `outcomes` recording what
   actually happened, including one prediction that has no evidence either way and
@@ -76,6 +79,18 @@ Initial draft. Nothing here is stable.
 - `tools/adr_import.py` emits `provenance.attestation: none` rather than the
   deprecated `reviewed_by_human: false`; the `--emit-attestation` flag is gone,
   since the field is now specified.
+
+- Decision Record: `outcomes[].predicted`, required whenever
+  `matched_prediction` is present. A bare verdict says a prediction failed
+  without saying which, and a record listing four consequences cannot afterwards
+  be read to learn which one. `matched_prediction` stays optional, so an
+  observation nobody predicted is recorded without a manufactured verdict.
+- Signal: `counterpart`, a second asset with the same shape and the same person
+  prohibition as `subject`. Duplicated effort, architecture violations and
+  temporal coupling are observations about a pair, and recording them against
+  one asset loses the half that makes them actionable.
+- SPEC §7's five open questions are answered, each in a decision record
+  (`DL-0008` to `DL-0012`), and kept in the document with their answers.
 
 ### Deprecated
 - `provenance.reviewed_by_human`. Still accepted, and still required when

@@ -1,0 +1,12 @@
+# SPEC 4.3 -- the person prohibition applies to counterpart identically.
+# Adding a second asset field must not become a second door for the same thing.
+id: SIG-9130
+type: duplicate_effort
+detected_at: 2026-06-20T14:00:00Z
+deterministic: true
+subject:
+  kind: work_item
+  ref: PLAT-2231
+counterpart:
+  kind: person
+  ref: j.smith

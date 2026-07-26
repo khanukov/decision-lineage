@@ -90,8 +90,15 @@
         "properties": {
           "date": { "type": "string", "format": "date" },
           "observation": { "type": "string" },
-          "matched_prediction": { "type": "boolean" }
-        }
+          "matched_prediction": { "type": "boolean" },
+          "predicted": { "type": "string", "minLength": 1 }
+        },
+        "allOf": [
+          {
+            "if": { "required": ["matched_prediction"] },
+            "then": { "required": ["predicted"] }
+          }
+        ]
       }
     },
     "origin": { "enum": ["own", "inherited"] },

@@ -147,6 +147,23 @@ cases:
       A batch assessment groups its signals with run and names what it compared
       against with baseline, using plain fields rather than a third record type.
 
+  - id: CF-A-016
+    file: valid/signal-counterpart.yaml
+    expect: accept
+    rule: "4.3"
+    rationale: >
+      Some observations are about a pair rather than a thing. A relational
+      signal names both assets, in `subject` and `counterpart`, rather than
+      losing the half that makes it actionable.
+
+  - id: CF-A-017
+    file: valid/decision-outcome-without-verdict.yaml
+    expect: accept
+    rule: "3.3"
+    rationale: >
+      An outcome may carry no verdict. Something can happen that nobody
+      predicted either way, and requiring a verdict would manufacture one.
+
   # ---------------------------------------------------------------- reject ---
 
   - id: CF-R-001
@@ -275,6 +292,28 @@ cases:
       attestation is a closed enumeration. Free text would make the difference
       between reviewed and confirmed unreadable by tooling, and that difference
       is the reason the field exists.
+
+  - id: CF-R-018
+    file: invalid/signal-counterpart-is-person.yaml
+    expect: reject
+    rule: "4.3"
+    rationale: >
+      The person prohibition applies to `counterpart` identically. Adding a
+      second asset field must not become a second door for the thing the first
+      one was shaped to keep out, and an implementation that guards `subject`
+      while ignoring `counterpart` has satisfied the letter of 4.3 and defeated
+      it.
+
+  - id: CF-R-019
+    file: invalid/decision-verdict-without-prediction.yaml
+    expect: reject
+    rule: "3.3"
+    rationale: >
+      `predicted` is required whenever `matched_prediction` is present. A bare
+      verdict records that a prediction failed without recording which one, and
+      a decision listing four consequences cannot afterwards be read to learn
+      which of the four was wrong. Aggregated, bare verdicts are worse than
+      absent ones: they invite counting outcomes that were never comparable.
 
   - id: CF-R-017
     file: invalid/decision-extracted-without-review-state.yaml
