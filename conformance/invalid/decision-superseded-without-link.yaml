@@ -1,0 +1,4 @@
+# SPEC 3.2 -- a record MUST NOT be superseded without relations.superseded_by.
+id: DL-9104
+title: Emit plain-text logs with a fixed prefix
+status: superseded

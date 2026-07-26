@@ -1,0 +1,6 @@
+# SPEC 3.1 -- `decision` is required once status is accepted.
+id: DL-9103
+title: Adopt structured logging across all services
+status: accepted
+context: >
+  Log formats diverged across services after the last two acquisitions.

@@ -1,0 +1,4 @@
+# SPEC 3.1 -- id, title and status are the only required fields.
+id: DL-9001
+title: Adopt a single time zone for all stored timestamps
+status: proposed

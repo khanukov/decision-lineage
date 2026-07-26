@@ -17,14 +17,21 @@ While the version is `0.x`, breaking changes are acceptable if justified. After 
 
 ## Changes to code
 
-`tools/validate.py` has no dependencies beyond `pyyaml` and `jsonschema` and should stay that way. Run it before opening a pull request:
+Tooling in `tools/` has no dependencies beyond `pyyaml` and `jsonschema` and should stay that way. Run all three before opening a pull request:
 
 ```bash
 pip install pyyaml jsonschema
-python3 tools/validate.py
+python3 tools/validate.py                                          # examples and decisions
+python3 tools/conformance.py                                       # normative rules
+python3 tools/adr_import.py examples/adr-samples --out /tmp/out \
+  && python3 tools/validate.py /tmp/out/*.yaml                     # importer round trip
 ```
 
 Every schema change needs a corresponding example that exercises it. CI validates `examples/` and `decisions/` on every push.
+
+**Every normative change needs a conformance case.** If a pull request adds, removes, or alters a *MUST* or *MUST NOT*, it adds or updates a fixture in `conformance/` and its manifest entry in the same change. A normative rule with no fixture is a rule nobody can be held to, and the suite is the only thing standing between "supports decision-lineage" and a claim that means something.
+
+Rules stated as *SHOULD* must **not** get conformance cases. An implementation that warns on a *SHOULD*, errors on it, or ignores it is equally conformant, so a fixture would fail correct implementations. Put *SHOULD* checks in `tools/validate.py` as warnings instead.
 
 ## Dogfooding
 

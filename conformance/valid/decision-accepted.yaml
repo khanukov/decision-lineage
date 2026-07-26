@@ -1,0 +1,8 @@
+# SPEC 3.1 -- `decision` is required once status is accepted, and is present.
+id: DL-9002
+title: Store all timestamps in UTC
+status: accepted
+date_decided: 2026-02-04
+decision: >
+  All persisted timestamps are stored in UTC. Local time is a presentation
+  concern and is resolved at the edge.

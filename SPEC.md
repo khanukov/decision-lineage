@@ -197,7 +197,17 @@ Mapping files *MUST* state that they are not a Statement of Applicability, not l
 
 An implementation is **conformant** if it produces records that validate against the schemas in `schema/`, honours §2.5 and §2.6, and does not represent persons as signal subjects (§4.3).
 
-There is currently no conformance test suite. This is a known gap.
+Conformance is checked by the suite in [`conformance/`](conformance/): a corpus of fixtures and a manifest stating, for each, whether a conformant implementation *MUST* accept or reject it. The runner is implementation-agnostic — it invokes a command per fixture and reads the exit status — so an implementation in any language can be tested without modification:
+
+```bash
+python3 tools/conformance.py --command "myimpl check {file}"
+```
+
+The suite covers normative rules only. A *SHOULD* cannot be a conformance case, because an implementation that warns, errors, or stays silent on it is equally conformant. Rules currently exercised: §2.3, §2.6, §3.1, §3.2, §3.3, §4.1, §4.2, §4.3, §4.5.
+
+§2.5 is *not* covered: immutability of accepted reasoning is a property of how a corpus changes across revisions, and cannot be tested by validating one file. See [`conformance/README.md`](conformance/README.md) for the remaining gaps.
+
+An implementation claiming conformance *SHOULD* publish the output of a suite run, naming the specification version it was run against. An unqualified claim of support is not verifiable.
 
 ## 7. Open questions
 

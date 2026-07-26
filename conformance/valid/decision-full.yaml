@@ -1,0 +1,81 @@
+# SPEC 3.3 -- every optional field at once. Catches schemas that forbid
+# combinations the specification permits.
+id: DL-9005
+title: Split the tenancy service from the billing monolith
+status: accepted
+date_decided: 2026-01-15
+review_by: 2027-01-15
+deciders: [head-of-platform, principal-engineer]
+
+scope:
+  services: [tenancy-service, billing]
+  repositories: [platform/tenancy, platform/billing]
+  teams: [platform]
+  environments: [production, staging]
+
+context: >
+  Billing release cadence was gating tenancy changes that carry no billing
+  risk, and the two domains had diverged in their consistency requirements.
+
+decision: >
+  Extract tenancy into its own service with an asynchronous interface to
+  billing. Billing remains the system of record for money.
+
+options:
+  - name: Extract tenancy into its own service
+    chosen: true
+  - name: Keep the monolith and split release trains
+    rejected_because: >
+      Release trains do not decouple the schema, which is where the actual
+      coupling lives.
+  - name: Extract billing instead
+    rejected_because: >
+      Billing carries the regulatory surface; moving it first maximises risk
+      for the same architectural benefit.
+
+consequences:
+  positive:
+    - Tenancy releases no longer wait on billing.
+    - Failure domains separate.
+  negative:
+    - Cross-domain reporting now requires joining across two stores.
+    - An asynchronous boundary introduces eventual consistency the UI must show.
+
+relations:
+  supersedes: [DL-9003]
+  depends_on: [DL-9002]
+  enables: [DL-9006]
+  constrains: [DL-9007]
+  constrained_by: [DL-9008]
+  conflicts_with: [DL-9009]
+
+evidence:
+  pull_requests: ["platform/tenancy#12", "platform/billing#455"]
+  commits: ["9f1c2ab", "3d7e004"]
+  paths: ["services/tenancy/", "services/billing/adapters/tenancy.py"]
+  urls: ["https://example.invalid/rfc/tenancy-split"]
+
+controls:
+  - framework: iso27001:2022
+    control: A.8.27
+    relationship: implements
+  - framework: iso27001:2022
+    control: A.8.25
+    relationship: relates_to
+
+outcomes:
+  - date: 2026-04-02
+    observation: >
+      Tenancy deploy frequency rose from weekly to daily within six weeks.
+    matched_prediction: true
+  - date: 2026-05-20
+    observation: >
+      Cross-domain reporting took three weeks longer than estimated.
+    matched_prediction: false
+
+provenance:
+  extracted_from: adr
+  extracted_at: 2026-01-20
+  extractor: adr_import.py/0.1.0
+  reviewed_by_human: true
+  confidence: 0.9

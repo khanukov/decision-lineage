@@ -1,0 +1,8 @@
+# SPEC 4.1 -- the five required fields of a Signal.
+id: SIG-9001
+type: review_bypass
+detected_at: 2026-05-14T09:12:00Z
+deterministic: true
+subject:
+  kind: repository
+  ref: platform/tenancy

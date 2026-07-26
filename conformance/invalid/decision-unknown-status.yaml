@@ -1,0 +1,4 @@
+# SPEC 3.1 -- status is a closed enumeration; tooling branches on it.
+id: DL-9102
+title: Adopt structured logging across all services
+status: under-discussion

@@ -1,0 +1,4 @@
+# SPEC 3.1 -- id is required.
+title: Adopt structured logging across all services
+status: accepted
+decision: All services emit JSON logs with a shared field set.

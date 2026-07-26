@@ -1,0 +1,11 @@
+# SPEC 3.3 -- an unreviewed extraction is valid data. It MUST NOT be presented
+# as authoritative, which is a presentation rule, not a validation rule.
+id: DL-9010
+title: Cache landlord portfolio summaries at the edge
+status: proposed
+provenance:
+  extracted_from: pull_request
+  extracted_at: 2026-06-11
+  extractor: adr_import.py/0.1.0
+  reviewed_by_human: false
+  confidence: 0.42
