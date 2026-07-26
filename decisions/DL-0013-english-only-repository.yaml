@@ -1,0 +1,87 @@
+# Dogfooding: decisions about this specification use this specification.
+# This record replaces what began as a separate MADR under docs/adr/. A
+# repository about decision records keeping a second decision archive in a
+# second format would have been an argument against its own premise.
+id: DL-0013
+title: Write every repository artifact in English, and enforce it mechanically
+status: accepted
+date_decided: 2026-07-25
+review_by: 2027-07-25
+deciders: [maintainer]
+
+scope:
+  repositories: [decision-lineage]
+
+context: >
+  This is a public specification. The people who need to read it are
+  distributed, and the intended audiences — contributors, external auditors,
+  acquirers performing technical due diligence, automated tooling — share no
+  first language. The maintainers do not all think in English, so drafts,
+  design notes and conversation happen elsewhere, and without an explicit rule
+  those drafts reach commits. Mixed-language repositories degrade predictably:
+  the non-English parts stop being reviewed, then stop being maintained, and
+  become a section nobody will touch.
+  There is a mechanical hazard alongside the social one. Cyrillic and Greek
+  homoglyphs render identically to Latin characters — CYRILLIC SMALL LETTER A
+  against Latin `a`, GREEK QUESTION MARK against a semicolon — and silently
+  break identifier matching, string comparison, imports and grep. They are a
+  known supply-chain vector and expensive to diagnose by eye.
+
+decision: >
+  Every artifact committed here is written in English: code, comments,
+  documentation, specification text, decision records, commit messages, branch
+  and tag names, pull request and issue text, test names, and file names. The
+  rule is enforced in CI by tools/check_language.py, which rejects non-Latin
+  scripts and flags homoglyphs. Isolated Greek letters are permitted as
+  mathematical notation; runs of two or more are rejected as prose. Work in any
+  language up to the point of commit.
+
+options:
+  - name: English only, enforced in CI
+    chosen: true
+  - name: English only, by convention
+    rejected_because: >
+      Conventions without enforcement decay, and the first untranslated commit
+      sets the new norm. The homoglyph hazard is invisible to review by
+      definition, so a convention cannot address it at all.
+  - name: Bilingual, with translated copies of each document
+    rejected_because: >
+      Translations diverge, a reader cannot tell which copy is authoritative,
+      and review cost doubles for a project with one maintainer.
+  - name: No policy
+    rejected_because: >
+      Guarantees the mixed-language outcome this record exists to prevent.
+
+consequences:
+  positive:
+    - Any contributor or auditor reads the whole repository without translation.
+    - Search, grep and review work over one vocabulary.
+    - Homoglyphs are caught at commit time rather than during debugging.
+  negative:
+    - Maintainers who draft in another language carry a translation step, and nuance is lost in it.
+    - "The check is a proxy: it cannot distinguish English from other Latin-script languages, which stays a reviewer's job."
+    - Two normative rules of this specification are similarly unenforceable, so the repository now has three rules that read as mechanical and are not.
+
+relations:
+  depends_on: [DL-0001]
+
+evidence:
+  paths:
+    - tools/check_language.py
+    - .github/workflows/language-check.yml
+    - CONTRIBUTING.md
+
+outcomes:
+  - date: 2026-07-25
+    observation: >
+      The check rejected its own documentation on first run. Both CONTRIBUTING
+      and this record's predecessor illustrated the hazard with a literal
+      Cyrillic character, and both were rejected, so the examples had to be
+      rewritten as codepoint names. A rule that catches its author immediately
+      is working.
+    predicted: Homoglyphs are caught at commit time rather than during debugging.
+    matched_prediction: true
+
+provenance:
+  extracted_from: manual
+  extracted_at: 2026-07-25

@@ -9,6 +9,19 @@ This is a specification, so the most valuable contributions are arguments, not c
 3. **Disagreement with `mappings/iso27001-2022.yaml` from anyone who has been through a certification audit.** Especially if an auditor rejected something the mapping claims is direct evidence.
 4. **Answers to the open questions in [SPEC.md](SPEC.md) §7.**
 
+## English only
+
+Everything committed here is written in English: code, comments, documentation, specification text, decision records, commit messages, branch names, pull request descriptions, issue text, and file names. This is a hard requirement, not a style preference. Draft in whatever language you think in; translate before you commit. See `decisions/DL-0013`.
+
+```bash
+python3 tools/check_language.py            # all tracked files
+python3 tools/check_language.py --staged   # what you are about to commit
+```
+
+The check rejects characters from non-Latin writing systems and flags homoglyphs — characters such as CYRILLIC SMALL LETTER A (U+0430), visually identical to Latin `a` (U+0061), which silently break string comparison, imports and search. This document cannot show you one, because the check would reject this document. Isolated Greek letters are permitted as mathematical notation; two or more in a row are rejected as prose.
+
+It cannot detect Latin-script text that is not English. That part is the reviewer's job.
+
 ## Changes to the specification
 
 Substantive changes need an issue before a pull request. The issue should state the problem, not the proposed field. Fields proposed without a stated problem will be asked for the problem.
@@ -21,10 +34,14 @@ Tooling in `tools/` has no dependencies beyond `pyyaml` and `jsonschema` and sho
 
 ```bash
 pip install pyyaml jsonschema
-python3 tools/validate.py                                          # examples and decisions
-python3 tools/conformance.py                                       # normative rules
+python3 tools/validate.py                       # examples and decisions
+python3 tools/conformance.py                    # normative rules
+python3 tools/playbook_lock.py --check          # question ids still mean the same thing
+python3 tools/history_check.py                  # accepted reasoning not edited in place
+python3 tools/lineage.py                        # the corpus answers its own questions
+python3 tools/check_language.py                 # English only
 python3 tools/adr_import.py examples/adr-samples --out /tmp/out \
-  && python3 tools/validate.py /tmp/out/*.yaml                     # importer round trip
+  && python3 tools/validate.py /tmp/out/*.yaml  # importer round trip
 ```
 
 Every schema change needs a corresponding example that exercises it. CI validates `examples/` and `decisions/` on every push.

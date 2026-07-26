@@ -1,0 +1,9 @@
+# Agent working files. The conventions that matter to a contributor live in
+# CONTRIBUTING.md; an agent's operating instructions are not project governance.
+CLAUDE.md
+AGENTS.md
+.claude/
+
+__pycache__/
+*.pyc
+.venv/
