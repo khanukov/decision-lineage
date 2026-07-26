@@ -27,6 +27,17 @@ jobs:
       - name: The reference implementation must be conformant
         run: python3 tools/conformance.py
 
+  playbook:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pyyaml
+      - name: Question ids must keep meaning the same thing
+        run: python3 tools/playbook_lock.py --check
+
   importer:
     runs-on: ubuntu-latest
     steps:

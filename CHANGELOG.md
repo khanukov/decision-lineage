@@ -36,6 +36,11 @@ Initial draft. Nothing here is stable.
   conformance, so none of it requires cloning this repository.
 - `INTEGRATIONS.md`: wiring for adr-tools, log4brains, Backstage, pre-commit and
   CI, and an explicit account of which direction each integration runs in.
+- `PLAYBOOK.md` and `playbook/questions.yaml`: the inheritance workflow the
+  specification was extracted from, with a fixed 22-question set. Non-normative.
+- `tools/playbook_lock.py`: fails CI when an existing question's wording changes
+  or an id disappears, since either silently invalidates comparisons drawn
+  across assessments. Appending questions stays free.
 
 ### Changed
 - SPEC.md §6 now defines how conformance is checked and what it does not cover.

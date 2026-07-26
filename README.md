@@ -77,6 +77,14 @@ Being explicit, because the surrounding space is full of overclaiming:
 - **Not an "AI CTO."** Nothing here makes decisions or evaluates whether a decision was correct. It records decisions, tracks whether they are still honoured, and links them to consequences. Judging strategy remains a human problem.
 - **Not stable.** v0.1.0-draft means v0.1.0-draft.
 
+## The workflow this came out of
+
+[PLAYBOOK.md](PLAYBOOK.md) describes taking over an engineering system you did not build — through acquisition, handover, or a team that left — and what to do in the first month. It is non-normative: the specification says what a record means, the playbook is one workflow that produces them.
+
+It is here because several fields are hard to justify in the abstract and obvious in context. `origin`, `attestation`, `run` and `baseline` read as overhead until you are looking at an inherited codebase trying to work out which of its choices anyone made on purpose.
+
+[`playbook/questions.yaml`](playbook/questions.yaml) is a fixed, numbered set of 22 questions, and fixed is the entire point: assessments that asked the same questions compare with each other, assessments that asked whatever seemed relevant at the time do not. `tools/playbook_lock.py` enforces that in CI, because rewording a question invalidates every comparison drawn from it and does so invisibly.
+
 ## Why not just use ADRs?
 
 ADRs remain excellent and this specification is designed to be a strict superset — any ADR converts to a Decision Record with empty optional fields. Five additions:

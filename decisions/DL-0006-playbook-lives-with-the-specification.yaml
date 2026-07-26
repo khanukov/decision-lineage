@@ -1,0 +1,73 @@
+# Dogfooding: decisions about this specification use this specification.
+id: DL-0006
+title: Keep the inheritance playbook in the specification repository
+status: accepted
+date_decided: 2026-07-25
+review_by: 2027-01-25
+deciders: [maintainer]
+
+scope:
+  repositories: [decision-lineage]
+
+context: >
+  DL-0001 drew a line: this repository holds a specification and no
+  implementation. A playbook is neither. It is a methodology — when to run an
+  assessment, what to ask, what to produce — and on a strict reading of DL-0001
+  it does not belong here. But the fields added in DL-0004 came directly out of
+  that workflow and are difficult to justify without it: `origin` and
+  `attestation` read as bureaucratic overhead until someone is looking at an
+  acquired codebase trying to work out which of its choices anyone made on
+  purpose. A format whose fields have no described workflow is a schema nobody
+  knows when to fill in, and the failure mode of every design rationale format
+  for thirty years has been fields nobody filled in.
+
+decision: >
+  Keep PLAYBOOK.md and playbook/questions.yaml in this repository, marked
+  clearly as non-normative. The specification defines what a record means; the
+  playbook describes one workflow that produces records. Neither constrains the
+  other.
+
+options:
+  - name: Keep the playbook here, marked non-normative
+    chosen: true
+  - name: A separate repository for the playbook
+    rejected_because: >
+      Cleaner separation, but it splits the argument from the artefact it argues
+      for, and doubles maintenance for a project with one maintainer and no
+      adopters. The playbook is currently the clearest available explanation of
+      why several fields exist; moving it away leaves the specification harder to
+      justify and the playbook harder to check.
+  - name: Fold it into README.md
+    rejected_because: >
+      Different audiences. README is read by someone deciding whether the format
+      is worth anything; the playbook is read by someone in the first week of an
+      integration with a deadline. Merging them serves neither, and README is
+      already long.
+  - name: Do not write it
+    rejected_because: >
+      Leaves origin, attestation, run and baseline as fields with no stated
+      occasion for use, which is the precise condition under which specification
+      fields go unfilled and then get removed as dead weight.
+
+consequences:
+  positive:
+    - The fields added in DL-0004 have a stated occasion for use, which is what makes them fillable.
+    - The fixed question set is versioned alongside the format it writes into, so a question and the field it populates cannot drift apart unnoticed.
+    - A reader evaluating the specification can see one complete workflow rather than inferring one.
+  negative:
+    - Methodology and specification now version together although they change at different rates, and the playbook will need its own version marker before long.
+    - A reader may take the playbook as normative. It is marked otherwise, which is a weaker guarantee than living somewhere else.
+    - The repository is no longer only a specification, which weakens DL-0001 by a second increment after the tooling already weakened it once.
+
+relations:
+  constrained_by: [DL-0001]
+  depends_on: [DL-0004]
+
+evidence:
+  paths:
+    - PLAYBOOK.md
+    - playbook/questions.yaml
+
+provenance:
+  extracted_from: manual
+  extracted_at: 2026-07-25

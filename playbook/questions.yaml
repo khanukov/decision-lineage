@@ -1,0 +1,206 @@
+# The fixed question set for an inheritance assessment.
+#
+# Fixed is the point. Five assessments that asked different questions produce
+# five essays; five that asked the same questions produce a comparison. Add
+# questions between runs only by appending — never renumber, never repurpose an
+# id, and never quietly change what a question means. An id whose meaning drifts
+# destroys every comparison that used it, silently.
+#
+# `method` distinguishes what a machine derives from what a person is asked.
+# Derived answers are cheap, repeatable and comparable across runs. Asked
+# answers are none of those things, and are here because a few of the most
+# useful facts about a codebase exist only in somebody's head.
+
+version: "0.1.0-draft"
+
+sections:
+
+  - id: K
+    title: Knowledge concentration
+    intent: >
+      Where the system depends on individuals. In an inherited team this is
+      almost always the largest risk and the one least visible from outside.
+    questions:
+      - id: K1
+        text: For each component, how many people wrote most of it?
+        method: derived
+        source: git history
+        answer_type: map of component to integer
+        why: >
+          Below two on a critical component means the system is one resignation
+          from unmaintainable. Reference practice treats two as the floor.
+      - id: K2
+        text: Which files have 95% or more of their lines authored by one person?
+        method: derived
+        source: git history
+        answer_type: list of paths
+        why: Knowledge islands are where integration estimates go wrong.
+      - id: K3
+        text: Which of the people in K1 and K2 are still employed, and for how long?
+        method: asked
+        source: seller
+        answer_type: list
+        why: >
+          Concentration matters only relative to retention. Ask about vesting
+          cliffs and equity outcomes at close; both create flight risk exactly
+          when the knowledge is most needed.
+      - id: K4
+        text: How long did the most recent hire take to make a meaningful contribution?
+        method: asked
+        source: seller, ideally that hire
+        answer_type: duration
+        why: >
+          The cheapest available measure of implicit knowledge. More than about
+          four weeks for a senior engineer means the system carries a great deal
+          that is written down nowhere.
+
+  - id: D
+    title: Deliberateness
+    intent: >
+      Which of the things this system does were chosen, and which merely
+      happened. This is the section the whole exercise exists for: rebuilding a
+      deliberate choice and preserving an accident are the two expensive
+      mistakes, and both come from being unable to tell them apart.
+    questions:
+      - id: D1
+        text: Are there decision records, ADRs, RFCs or design documents of any kind?
+        method: derived
+        source: repository, wiki
+        answer_type: count and location
+        why: Their absence is the normal case, not a red flag.
+      - id: D2
+        text: Which architectural choices look deliberate from the commit history?
+        method: derived
+        source: git history
+        answer_type: list of candidate decisions
+        why: >
+          Boundary-altering changes — a new dependency, a new persistence layer,
+          a new service — with a considered commit or pull request behind them.
+      - id: D3
+        text: For each candidate in D2, why was it done that way?
+        method: asked
+        source: a participant
+        answer_type: prose per candidate
+        why: >
+          The only question that separates a decision from an accident, and the
+          only one a machine cannot answer. Record who answered.
+      - id: D4
+        text: Which of those choices would the participant make differently now, and why?
+        method: asked
+        source: a participant
+        answer_type: prose per candidate
+        why: >
+          Distinguishes a position still held from one endured. It also tends to
+          surface the constraint that produced the choice, which is usually the
+          part worth inheriting.
+      - id: D5
+        text: What was tried and abandoned?
+        method: asked
+        source: a participant
+        answer_type: prose
+        why: >
+          Abandoned approaches are the cheapest knowledge in the acquisition and
+          the first thing lost when people leave. Without them an acquirer
+          re-runs an experiment that already failed here.
+
+  - id: C
+    title: Control state
+    intent: >
+      What the engineering process actually enforces, as opposed to what anyone
+      says it does. All derived, all deterministic, all cheap.
+    questions:
+      - id: C1
+        text: What proportion of changes merged without review?
+        method: derived
+        source: git and forge API
+        answer_type: percentage over trailing 12 months
+      - id: C2
+        text: Were there force pushes to protected branches, and when?
+        method: derived
+        source: forge events
+        answer_type: list of events
+      - id: C3
+        text: Which CI or security gates exist, and were any disabled or skipped?
+        method: derived
+        source: workflow file history
+        answer_type: timeline
+      - id: C4
+        text: Are there credentials in the repository or in its history?
+        method: derived
+        source: secret scanning over full history
+        answer_type: list with first and last commit
+        why: >
+          History matters as much as the working tree. A rotated secret still in
+          history is a finding; an unrotated one is an incident that starts on
+          the day access transfers.
+      - id: C5
+        text: Who has write and admin access, and does it match who works there?
+        method: derived
+        source: forge access lists
+        answer_type: list
+      - id: C6
+        text: Which dependencies are unmaintained, unpatched, or licence-incompatible?
+        method: derived
+        source: dependency manifests
+        answer_type: list with severity
+
+  - id: T
+    title: Debt and coupling
+    intent: What integration will cost, expressed in things that can be counted.
+    questions:
+      - id: T1
+        text: Which files change most often and are also most complex?
+        method: derived
+        source: git history
+        answer_type: ranked list
+      - id: T2
+        text: Which components change together despite having no declared dependency?
+        method: derived
+        source: git history
+        answer_type: list of pairs
+        why: Temporal coupling is where an integration plan is most often wrong.
+      - id: T3
+        text: What is the deploy frequency and the lead time from merge to production?
+        method: derived
+        source: CI and deploy history
+        answer_type: two numbers
+      - id: T4
+        text: What data does the system hold about tenants, customers or employees, and where?
+        method: derived and asked
+        source: schema, data map, seller
+        answer_type: inventory
+        why: >
+          Liability for the target's data protection failures transfers on
+          completion. This question is asked for legal reasons, not engineering
+          ones, and it is the one most often skipped by engineers.
+
+  - id: G
+    title: Gaps against baseline
+    intent: >
+      The comparison that turns an assessment into an integration plan. Requires
+      that a baseline exists and is written down, which is why the playbook says
+      to run the whole set against your own systems first.
+    questions:
+      - id: G1
+        text: Which of your baseline controls are absent here?
+        method: derived
+        source: C section answers versus baseline
+        answer_type: list of gaps
+      - id: G2
+        text: For each gap, is it closed by configuration, by work, or by a decision to accept it?
+        method: asked
+        source: acquirer
+        answer_type: classification per gap
+        why: >
+          A gap accepted deliberately is a decision and gets a record. A gap
+          nobody classified is how an integration quietly never finishes.
+      - id: G3
+        text: Which of their decisions conflict with yours?
+        method: asked
+        source: acquirer, using D3 answers
+        answer_type: list of conflicting pairs
+        why: >
+          These become `conflicts_with` relations. Two accepted decisions that
+          contradict each other are the thing an integration must resolve
+          explicitly, and the thing that is otherwise discovered eighteen months
+          later by an engineer who assumed the older one still held.
