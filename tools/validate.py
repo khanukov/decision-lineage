@@ -65,9 +65,24 @@ def extra_checks(doc, kind):
         if doc.get("status") == "accepted" and "review_by" not in doc:
             warnings.append("no review_by: decision asserted as permanent")
         prov = doc.get("provenance") or {}
-        if prov.get("extracted_from", "manual") != "manual" and not prov.get("reviewed_by_human"):
-            warnings.append("extracted record not reviewed by a human: candidate only")
+        if prov.get("extracted_from", "manual") != "manual":
+            if effective_attestation(prov) == "none":
+                warnings.append("extracted record with no attestation: candidate only")
+            if "attestation" not in prov:
+                warnings.append("reviewed_by_human is deprecated: use provenance.attestation")
+        if doc.get("origin") == "inherited":
+            warnings.append(
+                f"inherited from {doc.get('origin_source')!r}: check this names an "
+                "organisation and not a person"
+            )
     return [], warnings
+
+
+def effective_attestation(provenance):
+    """Resolve attestation, falling back to the deprecated boolean (SPEC 3.3)."""
+    if "attestation" in provenance:
+        return provenance["attestation"]
+    return "record_reviewed" if provenance.get("reviewed_by_human") else "none"
 
 
 def main(argv):

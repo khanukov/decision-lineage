@@ -1,0 +1,11 @@
+# SPEC 3.3 -- attested_by MUST NOT be present when attestation is none.
+# Naming an attester while recording that nobody attested is a contradiction
+# that reads, at a glance, as confirmation.
+id: DL-9121
+title: Keep the legacy pricing table denormalised
+status: proposed
+provenance:
+  extracted_from: transcript
+  extracted_at: 2026-06-02
+  attestation: none
+  attested_by: former-technical-lead-agency-west

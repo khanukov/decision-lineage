@@ -1,0 +1,10 @@
+# SPEC 3.3 -- the deprecated reviewed_by_human flag is still accepted when
+# attestation is absent. Consumers MUST accept either form.
+id: DL-9022
+title: Serve portfolio summaries from a read replica
+status: accepted
+decision: Read traffic for portfolio summaries goes to the replica.
+provenance:
+  extracted_from: adr
+  extracted_at: 2026-05-01
+  reviewed_by_human: true

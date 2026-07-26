@@ -94,6 +94,12 @@
         }
       }
     },
+    "origin": { "enum": ["own", "inherited"] },
+    "origin_source": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Organisation, team or acquired entity. Never a person (SPEC 3.3)."
+    },
     "provenance": {
       "type": "object",
       "required": ["extracted_from"],
@@ -103,18 +109,30 @@
         },
         "extracted_at": { "type": "string", "format": "date" },
         "extractor": { "type": "string" },
+        "attestation": { "enum": ["none", "record_reviewed", "participant_confirmed"] },
+        "attested_by": { "type": "string", "minLength": 1 },
         "reviewed_by_human": { "type": "boolean" },
         "confidence": { "type": "number", "minimum": 0, "maximum": 1 }
       },
       "allOf": [
         {
           "if": {
-            "properties": {
-              "extracted_from": { "not": { "const": "manual" } }
-            },
-            "required": ["extracted_from"]
+            "allOf": [
+              {
+                "properties": { "extracted_from": { "not": { "const": "manual" } } },
+                "required": ["extracted_from"]
+              },
+              { "not": { "required": ["attestation"] } }
+            ]
           },
           "then": { "required": ["reviewed_by_human"] }
+        },
+        {
+          "if": {
+            "properties": { "attestation": { "const": "none" } },
+            "required": ["attestation"]
+          },
+          "then": { "not": { "required": ["attested_by"] } }
         }
       ]
     }
@@ -123,6 +141,10 @@
     {
       "if": { "properties": { "status": { "const": "accepted" } }, "required": ["status"] },
       "then": { "required": ["decision"] }
+    },
+    {
+      "if": { "properties": { "origin": { "const": "inherited" } }, "required": ["origin"] },
+      "then": { "required": ["origin_source"] }
     },
     {
       "if": { "properties": { "status": { "const": "superseded" } }, "required": ["status"] },

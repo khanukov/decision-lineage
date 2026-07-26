@@ -112,6 +112,41 @@ cases:
       The signal type list is open. An implementation MUST NOT reject a type it
       does not recognise, or the vocabulary cannot grow.
 
+  - id: CF-A-012
+    file: valid/decision-origin-inherited.yaml
+    expect: accept
+    rule: "3.3"
+    rationale: >
+      An inherited decision names the entity it came from, which is what lets a
+      reader separate positions the organisation chose from positions it
+      absorbed.
+
+  - id: CF-A-013
+    file: valid/decision-attested.yaml
+    expect: accept
+    rule: "3.3"
+    rationale: >
+      A record confirmed by someone who took part, recording who confirmed it.
+      This is the strongest provenance the model expresses and the only one that
+      checks a record against events rather than against a document.
+
+  - id: CF-A-014
+    file: valid/decision-legacy-reviewed-flag.yaml
+    expect: accept
+    rule: "3.3"
+    rationale: >
+      The deprecated reviewed_by_human flag remains valid where attestation is
+      absent. Consumers MUST accept both forms, or deprecating the field breaks
+      every record written before it was deprecated.
+
+  - id: CF-A-015
+    file: valid/signal-run-baseline.yaml
+    expect: accept
+    rule: "4.5"
+    rationale: >
+      A batch assessment groups its signals with run and names what it compared
+      against with baseline, using plain fields rather than a third record type.
+
   # ---------------------------------------------------------------- reject ---
 
   - id: CF-R-001
@@ -206,3 +241,47 @@ cases:
     rationale: >
       disposition.state is a closed enumeration because it drives whether a
       signal is still outstanding.
+
+  - id: CF-R-013
+    file: invalid/decision-inherited-without-source.yaml
+    expect: reject
+    rule: "3.3"
+    rationale: >
+      origin_source is required when origin is inherited. An inherited decision
+      with no named source cannot be distinguished from an own decision nobody
+      has examined, which is the whole distinction the field exists to draw.
+
+  - id: CF-R-014
+    file: invalid/decision-attested-by-without-attestation.yaml
+    expect: reject
+    rule: "3.3"
+    rationale: >
+      attested_by MUST NOT appear when attestation is none. A named attester
+      beside a record stating that nobody attested reads, at a glance, as
+      confirmation — which is precisely the misreading the attestation field was
+      added to prevent.
+
+  - id: CF-R-015
+    file: invalid/decision-unknown-origin.yaml
+    expect: reject
+    rule: "3.3"
+    rationale: "origin is a closed enumeration."
+
+  - id: CF-R-016
+    file: invalid/decision-unknown-attestation.yaml
+    expect: reject
+    rule: "3.3"
+    rationale: >
+      attestation is a closed enumeration. Free text would make the difference
+      between reviewed and confirmed unreadable by tooling, and that difference
+      is the reason the field exists.
+
+  - id: CF-R-017
+    file: invalid/decision-extracted-without-review-state.yaml
+    expect: reject
+    rule: "3.3"
+    rationale: >
+      An extracted record MUST state how much is known about it, through either
+      attestation or the deprecated reviewed_by_human. Silence would let an
+      unreviewed extraction circulate as an ordinary decision, which is the
+      failure this specification exists to prevent.

@@ -1,0 +1,86 @@
+# Dogfooding: decisions about this specification use this specification.
+id: DL-0004
+title: Record where a decision came from, how strongly it is attested, and which assessment produced a signal
+status: accepted
+date_decided: 2026-07-25
+review_by: 2027-01-25
+deciders: [maintainer]
+
+scope:
+  repositories: [decision-lineage]
+
+context: >
+  Three gaps surfaced while working through the case the model is weakest at:
+  an organisation absorbing engineering teams and their undocumented history.
+  First, a record set that mixes an organisation's own decisions with decisions
+  absorbed from acquired entities cannot answer which of them were chosen
+  deliberately, which is the question that makes the set worth keeping. Second,
+  reviewed_by_human collapsed two different epistemic states into one boolean:
+  a person read the record, and a person who was present confirmed the
+  reasoning. For inherited decisions the gap between those is at its widest and
+  matters most, because the people able to confirm often have an interest in how
+  the decision is described. Third, signals were modelled for continuous
+  detection, while an assessment performed as a discrete exercise produces a
+  batch that means something as a set and needs to say which batch and against
+  what.
+
+decision: >
+  Add `origin` and `origin_source` to the Decision Record; add
+  `provenance.attestation` with `attested_by`, deprecating but still accepting
+  `reviewed_by_human`; add `run` and `baseline` to the Signal. All are optional,
+  so no record that validated before stops validating.
+
+options:
+  - name: Two flat fields for origin, a three-valued attestation, two flat fields on the signal
+    chosen: true
+  - name: An `origin` object holding type, source and acquisition date
+    rejected_because: >
+      More extensible and closer to the house style for grouped data, but the
+      third field it anticipates has no use yet. A field added for a use that has
+      not appeared is how a specification starts to rot, and CONTRIBUTING treats
+      arguing for removal as equal in value to arguing for addition.
+  - name: Keep reviewed_by_human and add attestation beside it as independent fields
+    rejected_because: >
+      Two overlapping fields describing the same thing invite records that set
+      them inconsistently, and consumers would have to decide which wins.
+      Deprecation with a defined equivalence has one answer.
+  - name: Remove reviewed_by_human outright
+    rejected_because: >
+      Every record written before this change would stop validating, which is the
+      definition of a breaking change under GOVERNANCE.md, for no benefit beyond
+      tidiness.
+  - name: An Assessment record type holding run identity, baseline and its signals
+    rejected_because: >
+      A third top-level type needs a lifecycle, a relation to signals, and its own
+      conformance surface, in exchange for what two optional strings already
+      express. The model has two entities on purpose.
+  - name: Allow origin_source to name an individual
+    rejected_because: >
+      Attributing inherited decisions to named individuals turns an integration
+      record into an assessment of the people who were acquired. That is the same
+      prohibition as SPEC 4.3 wearing different clothes.
+
+consequences:
+  positive:
+    - Inherited and own decisions are separable, so integration can stop re-litigating deliberate choices.
+    - The difference between a reviewed record and a confirmed one is legible to tooling rather than left to prose.
+    - Batch assessments are expressible without a third entity.
+  negative:
+    - "`origin_source` naming an organisation is a prose rule that no schema can enforce; only its presence is checkable."
+    - Two ways of expressing review state exist until `reviewed_by_human` is removed at a major version.
+    - "`attestation: participant_confirmed` records who confirmed, not whether they were disinterested. It is provenance, not truth."
+
+relations:
+  constrained_by: [DL-0001]
+
+evidence:
+  paths:
+    - SPEC.md
+    - schema/decision-record.schema.json
+    - schema/signal.schema.json
+    - conformance/manifest.yaml
+    - examples/DL-0021-inherited-crm-schema.yaml
+
+provenance:
+  extracted_from: manual
+  extracted_at: 2026-07-25

@@ -1,0 +1,8 @@
+# SPEC 3.3 -- origin_source is required when origin is inherited. An inherited
+# decision with no named source cannot be told from an unexamined own decision,
+# which is the distinction the field exists to make.
+id: DL-9120
+title: Store tenancy documents in a separate vault
+status: accepted
+decision: Documents remain where they are.
+origin: inherited

@@ -1,0 +1,12 @@
+# SPEC 4.5 -- a batch assessment groups its signals and names what it compared
+# against. Both are plain fields; there is no Assessment entity.
+id: SIG-9020
+type: architecture_violation
+detected_at: 2026-06-18T10:00:00Z
+deterministic: true
+severity: medium
+run: dd-agency-north-2026-06
+baseline: group-engineering-standard-v3
+subject:
+  kind: repository
+  ref: agency-north/lettings-portal

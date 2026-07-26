@@ -1,0 +1,9 @@
+# SPEC 3.3 -- attestation is a closed enumeration. A free-text value would make
+# the difference between reviewed and confirmed unreadable by tooling.
+id: DL-9123
+title: Serve portfolio summaries from a read replica
+status: proposed
+provenance:
+  extracted_from: adr
+  extracted_at: 2026-05-01
+  attestation: probably-fine

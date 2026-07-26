@@ -26,8 +26,21 @@ Two guarantees, because they are what make the output usable:
    emitted as `proposed`, not as an accepted record with an empty decision.
 
 2. **Nothing is presented as authoritative.** Imported records carry
-   `provenance.reviewed_by_human: false`. Per SPEC 3.3 they are candidates
-   until a human curates them. The importer never sets that flag to true.
+   `provenance.attestation: none`. Per SPEC 3.3 they are candidates until
+   someone curates them. The importer has no option to claim otherwise: it
+   cannot review a record, and it certainly cannot confirm one with a person
+   who took part.
+
+Importing another organisation's ADRs — a company being acquired, a system
+being taken over — is the case this was built for. Use `--origin inherited`
+with `--origin-source` so that the resulting records stay distinguishable from
+decisions your own organisation made:
+
+    python3 tools/adr_import.py ../agency-north/doc/adr \\
+        --origin inherited --origin-source agency-north --out records/
+
+`--origin-source` names an organisation or team. It must never name a person;
+see SPEC 3.3.
 """
 
 from __future__ import annotations
@@ -373,7 +386,7 @@ def slugify(text: str) -> str:
     return slug[:60] or "record"
 
 
-def convert(path: Path, prefix: str, emit_attestation: bool) -> ImportedRecord:
+def convert(path: Path, prefix: str, origin: str | None, origin_source: str | None) -> ImportedRecord:
     text = path.read_text(encoding="utf-8", errors="replace")
     frontmatter, body = split_frontmatter(text)
     title, sections, raw_sections = parse_sections(body)
@@ -454,19 +467,21 @@ def convert(path: Path, prefix: str, emit_attestation: bool) -> ImportedRecord:
         record["relations"] = relations
         found.append("relations")
 
+    if origin:
+        record["origin"] = origin
+        if origin_source:
+            record["origin_source"] = origin_source
+
     expected = ["status", "decision", "context", "date", "options", "consequences"]
     confidence = round(len([key for key in found if key in expected]) / len(expected), 2)
 
-    provenance = {
+    record["provenance"] = {
         "extracted_from": "adr",
         "extracted_at": datetime.date.today().isoformat(),
         "extractor": EXTRACTOR,
-        "reviewed_by_human": False,
+        "attestation": "none",
         "confidence": confidence,
     }
-    if emit_attestation:
-        provenance["attestation"] = "none"
-    record["provenance"] = provenance
 
     return ImportedRecord(source=path, record=record, warnings=warnings, found=found)
 
@@ -474,8 +489,8 @@ def convert(path: Path, prefix: str, emit_attestation: bool) -> ImportedRecord:
 def dump(record: dict) -> str:
     header = (
         "# Imported from an ADR by tools/adr_import.py.\n"
-        "# provenance.reviewed_by_human is false: this is a candidate, not an\n"
-        "# authoritative decision (SPEC 3.3). Curate before relying on it.\n"
+        "# provenance.attestation is none: this is a candidate, not an authoritative\n"
+        "# decision (SPEC 3.3). Curate before relying on it.\n"
     )
     return header + yaml.safe_dump(record, sort_keys=False, allow_unicode=True, width=88)
 
@@ -489,11 +504,24 @@ def main() -> int:
     parser.add_argument("--id-prefix", default="DL-", help="identifier prefix (default: DL-)")
     parser.add_argument("--report", action="store_true", help="summarise what was extracted, write nothing")
     parser.add_argument(
-        "--emit-attestation",
-        action="store_true",
-        help="also emit provenance.attestation: none (forward compatibility; ignored by SPEC 2.6 consumers)",
+        "--origin",
+        choices=["own", "inherited"],
+        help="mark the imported decisions as your organisation's own or as inherited",
+    )
+    parser.add_argument(
+        "--origin-source",
+        help="organisation, team or acquired entity the decisions came from. Never a person (SPEC 3.3)",
     )
     arguments = parser.parse_args()
+
+    if arguments.origin == "inherited" and not arguments.origin_source:
+        sys.exit(
+            "--origin inherited requires --origin-source.\n"
+            "An inherited decision with no named source cannot be told apart from an\n"
+            "own decision nobody has examined, which is the distinction it exists to draw."
+        )
+    if arguments.origin_source and not arguments.origin:
+        sys.exit("--origin-source requires --origin inherited")
 
     source = Path(arguments.source)
     if source.is_file():
@@ -506,7 +534,9 @@ def main() -> int:
     if not paths:
         sys.exit(f"no ADR markdown files found in {source}")
 
-    imported = [convert(path, arguments.id_prefix, arguments.emit_attestation) for path in paths]
+    imported = [
+        convert(path, arguments.id_prefix, arguments.origin, arguments.origin_source) for path in paths
+    ]
 
     if arguments.report:
         print(f"{'source':38}  {'id':12}  {'status':10}  conf  fields")

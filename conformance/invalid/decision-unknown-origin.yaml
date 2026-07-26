@@ -1,0 +1,6 @@
+# SPEC 3.3 -- origin is a closed enumeration.
+id: DL-9122
+title: Store tenancy documents in the agency's existing vault
+status: proposed
+origin: acquired
+origin_source: agency-north
