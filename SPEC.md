@@ -33,7 +33,9 @@ Consumers cannot detect this reliably from one record, so a consumer loading mul
 
 **2.4 Dates.** All dates *MUST* be ISO 8601. Date-only precision is sufficient for decisions; timestamps are required for signals.
 
-**2.5 Immutability of accepted decisions.** Once a Decision Record has `status: accepted`, its `decision`, `context`, and `options` fields *SHOULD NOT* be edited to reflect a change of position. A changed position is a new record that `supersedes` the old one. Editing to correct errors, add `evidence`, or append `outcomes` is expected and permitted.
+**2.5 Immutability of accepted decisions.** Once a Decision Record has `status: accepted`, its `decision`, `context`, `options`, and `consequences` fields *SHOULD NOT* be edited to reflect a change of position. A changed position is a new record that `supersedes` the old one. Editing to correct errors, add `evidence`, or append `outcomes` is expected and permitted.
+
+`consequences` is protected for a reason distinct from the other three. It holds predictions, and a prediction edited after its outcome is known is not a record of anything. Revising what you expected to happen, once you know what happened, is the ordinary way a forecasting archive becomes a record of having been right all along — and it is easier to do accidentally here than anywhere else in the model, because appending the outcome and adjusting the prediction feel like the same act of tidying.
 
 **2.6 Unknown fields.** Consumers *MUST* ignore unrecognised fields rather than reject the record. This allows organisation-specific extension without forking the schema.
 
@@ -101,7 +103,11 @@ Producers *SHOULD* write only one direction; consumers *SHOULD* derive the inver
 
 **`controls`** (array of object) — each entry has `framework` (string, e.g. `iso27001:2022`), `control` (string, e.g. `A.8.27`), and optional `relationship` with values `implements`, `weakens`, or `relates_to`. `weakens` is important and *SHOULD* be used honestly: decisions that trade away a control are exactly the decisions worth finding later.
 
-**`outcomes`** (array of object) — what actually happened. Each entry has `date`, `observation` (string), and optional `matched_prediction` (boolean). This field is appended over time and is the only feedback mechanism in the specification.
+**`outcomes`** (array of object) — what actually happened. Each entry has `date`, `observation` (string), and optionally `matched_prediction` (boolean) and `predicted` (string). This field is appended over time and is the only feedback mechanism in the specification.
+
+`predicted` *MUST* be present when `matched_prediction` is, and *SHOULD* quote the entry from `consequences` being judged. A bare `matched_prediction: false` says a prediction failed without saying which, and a record whose `consequences` list four things cannot be read afterwards to learn which of the four was wrong. Aggregated across a corpus the bare boolean is worse than absent: it invites counting outcomes that were never comparable.
+
+An outcome *MAY* be recorded with no `matched_prediction` at all. Something can happen that nobody predicted either way, and forcing a verdict would only produce false ones.
 
 **`origin`** (enum) — whether the decision was made by the organisation holding the record, or inherited from elsewhere. Values are `own` and `inherited`. Absent means `own`.
 
@@ -178,6 +184,12 @@ Reference types. The list is open; implementations *MAY* define others.
 
 **`kind` *MUST NOT* be a person.** This specification defines no representation for a human subject of a signal. Implementations that add one are outside the specification.
 
+**`counterpart`** (object, optional) — a second asset, with the same required shape and the same permitted `kind` values as `subject`. Some observations are inherently about a pair rather than a thing: `duplicate_effort` says two work items overlap, `architecture_violation` says one module reaches into another, and temporal coupling says two components change together. Recording those against a single subject loses the half that makes them actionable.
+
+`counterpart` is not a second subject in the sense that matters for §4.3: the prohibition applies identically, and an implementation that puts a person in `counterpart` has violated the same rule by a different route.
+
+A signal *SHOULD NOT* be duplicated in both directions. One signal with a `subject` and a `counterpart` describes the relationship once; two mirrored signals describe it twice and disagree the moment one is dispositioned.
+
 ### 4.4 Determinism
 
 `deterministic: true` asserts that the signal was produced by a rule or metric that will yield the same result given the same inputs. `false` indicates statistical or model-based inference.
@@ -247,10 +259,20 @@ An implementation claiming conformance *SHOULD* publish the output of a suite ru
 
 ## 7. Open questions
 
-Tracked in the issue tracker. The significant ones:
+The five questions this section opened with are now answered, each in a decision record. They are kept here with their answers rather than deleted, because a question that turned out to have a boring answer is worth as much to the next reader as one that did not.
 
-1. Should `relations` support weights or confidence, or is the graph strictly boolean?
-2. Is `outcomes` sufficient, or does the specification need explicit prediction–verification pairing?
-3. Should mapping files align with OSCAL, and if so at which layer?
-4. Is `duplicate_effort` a signal about two subjects, and if so is the single-`subject` model wrong?
-5. Should `scope` support negative scoping — "all services except these"?
+1. **Should `relations` support weights or confidence, or is the graph strictly boolean?** Strictly boolean. Resolved in `decisions/DL-0008`. A dependency either holds or does not, and a numeric edge weight would be a judgement nobody can calibrate, aggregated by tooling into rankings that look quantitative and are not.
+
+2. **Is `outcomes` sufficient?** No, and it is now fixed: `predicted` is required alongside `matched_prediction` (§3.3). Resolved in `decisions/DL-0009`. §2.5 was extended to protect `consequences` in the same change, since an outcome pointing at a prediction that can be edited afterwards records nothing.
+
+3. **Should mapping files align with OSCAL, and if so at which layer?** Not yet, and the correspondence is documented instead so that alignment stays cheap. Resolved in `decisions/DL-0010`.
+
+4. **Is `duplicate_effort` a signal about two subjects?** Yes, and so are several others. `counterpart` was added (§4.3) rather than making `subject` plural. Resolved in `decisions/DL-0011`.
+
+5. **Should `scope` support negative scoping?** Deferred, with no evidence either way. Resolved in `decisions/DL-0012`.
+
+New questions are tracked in the issue tracker. The ones known to be open:
+
+- No implementation outside this repository emits these records, and no candidate producer has been identified.
+- `origin_source` naming an organisation rather than a person is normative and unenforceable by any schema.
+- Whether `attestation` needs a fourth value between `record_reviewed` and `participant_confirmed`, for a participant who confirmed but was not the decider.

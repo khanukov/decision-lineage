@@ -222,7 +222,7 @@ def q_evidence(corpus: Corpus, identifier: str) -> None:
 
 def q_predictions(corpus: Corpus) -> None:
     print("Predictions against outcomes")
-    held, missed, unchecked = [], [], []
+    held, missed, no_verdict, unchecked = [], [], [], []
     for identifier, record in sorted(corpus.records.items()):
         outcomes = record.get("outcomes") or []
         predicted = bool((record.get("consequences") or {}))
@@ -237,10 +237,22 @@ def q_predictions(corpus: Corpus) -> None:
                 held.append(entry)
             elif matched is False:
                 missed.append(entry)
-    for label, rows in (("held", held), ("did not hold", missed)):
+            else:
+                no_verdict.append(entry)
+    for label, rows in (
+        ("held", held),
+        ("did not hold", missed),
+        ("were observed without a verdict", no_verdict),
+    ):
         print(f"\n  Predictions that {label}: {len(rows)}")
         for identifier, date, observation in rows:
             print(f"    {identifier}  {date}  {' '.join(str(observation).split())[:88]}")
+    if no_verdict:
+        print(
+            "\n  A verdict is optional on purpose. An outcome nobody predicted, or a prediction\n"
+            "  nobody has yet been able to check, is more honestly recorded without one than\n"
+            "  forced into true or false."
+        )
     if unchecked:
         print(
             f"\n  {len(unchecked)} decision(s) predicted consequences and recorded no outcome:"

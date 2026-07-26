@@ -1,0 +1,76 @@
+# Dogfooding: decisions about this specification use this specification.
+id: DL-0009
+title: Require an outcome to name the prediction it judges, and protect consequences from later edits
+status: accepted
+date_decided: 2026-07-25
+review_by: 2027-07-25
+deciders: [maintainer]
+
+scope:
+  repositories: [decision-lineage]
+
+context: >
+  SPEC 7 asked whether `outcomes` was sufficient. Writing outcomes onto this
+  repository's own decisions answered it: a record listing four consequences,
+  carrying an outcome with `matched_prediction: false`, does not say which of
+  the four failed. The verdict was uninterpretable at the moment of writing, by
+  the person who wrote it, and the workaround was to quote the prediction in
+  prose inside the observation. Aggregated across a corpus the bare boolean is
+  worse than absent: it invites counting outcomes that were never comparable.
+  A second gap surfaced alongside it. 2.5 protected `decision`, `context` and
+  `options` but not `consequences`, so an outcome could point at a prediction
+  that was editable after the fact — which makes the pointer worthless and the
+  archive flattering.
+
+decision: >
+  `predicted` is required whenever `matched_prediction` is present, and should
+  quote the consequence being judged. `matched_prediction` stays optional, so an
+  outcome nobody predicted, or a prediction nobody has yet checked, is recorded
+  without a verdict rather than forced into one. 2.5 is extended to cover
+  `consequences`.
+
+options:
+  - name: Require `predicted` alongside `matched_prediction`, protect `consequences`
+    chosen: true
+  - name: Give each consequence an identifier and have outcomes reference it
+    rejected_because: >
+      Structurally cleaner and breaking: `consequences` becomes an array of
+      objects, every existing record stops validating, and the field people fill
+      most readily acquires ceremony. The cost lands on the wrong field.
+  - name: Reference a consequence by index, such as `negative[0]`
+    rejected_because: >
+      An index is stable only while the list is, and 2.5 protects the list only
+      as of this change. It also reads as noise to a human, who is the primary
+      consumer of a decision record.
+  - name: Drop `matched_prediction` as under-specified
+    rejected_because: >
+      It is the only feedback mechanism in the model. Removing it would leave a
+      decision log that records what was decided and never whose reasoning held.
+  - name: Leave it and rely on prose
+    rejected_because: >
+      That is what was already happening, and it produced a boolean nobody could
+      interpret three records into a corpus of eleven.
+
+consequences:
+  positive:
+    - A verdict is now interpretable by someone who was not there.
+    - Predictions cannot be revised once their outcome is known, which is the ordinary way a forecasting archive becomes a record of having been right all along.
+    - The three real states — held, did not hold, not yet knowable — are all expressible.
+  negative:
+    - "`predicted` duplicates text that already exists in `consequences`, and the two can drift."
+    - Protecting `consequences` means a genuine error in a prediction can no longer be tidied, only superseded.
+    - Records written before this change carry verdicts without predictions and had to be edited to remain valid, which is a breaking change inside a 0.x version.
+
+relations:
+  depends_on: [DL-0001]
+
+evidence:
+  paths:
+    - SPEC.md
+    - schema/decision-record.schema.json
+    - tools/history_check.py
+    - conformance/invalid/decision-verdict-without-prediction.yaml
+
+provenance:
+  extracted_from: manual
+  extracted_at: 2026-07-25

@@ -1,0 +1,12 @@
+# SPEC 4.3 -- a relational observation names both assets.
+id: SIG-9030
+type: duplicate_effort
+detected_at: 2026-06-20T14:00:00Z
+deterministic: false
+confidence: 0.66
+subject:
+  kind: work_item
+  ref: PLAT-2231
+counterpart:
+  kind: work_item
+  ref: TEN-118

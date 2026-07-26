@@ -1,0 +1,81 @@
+# Dogfooding: decisions about this specification use this specification.
+id: DL-0010
+title: Document the OSCAL correspondence rather than adopt OSCAL structure
+status: accepted
+date_decided: 2026-07-25
+review_by: 2027-07-25
+deciders: [maintainer]
+
+scope:
+  repositories: [decision-lineage]
+
+context: >
+  SPEC 7 asked whether mapping files should align with OSCAL, and at which
+  layer. Examining the layers answered the second half in a way that reframes
+  the first. OSCAL's Mapping Model, added in v1.2.1 in March 2026, relates
+  controls to controls across frameworks; `mappings/iso27001-2022.yaml` relates
+  a signal type to a control, and a signal type is not a control, so the model
+  that looks like the obvious home is the wrong one. The closer correspondences
+  are elsewhere: an individual Signal resembles an observation in the assessment
+  results layer, and the mapping file resembles a component definition — a class
+  of tool declaring which controls it can produce evidence for.
+  Adoption is the other half of the picture. FedRAMP RFC-0024 requires
+  machine-readable authorisation packages by September 2026, and in 2025 FedRAMP
+  processed over a hundred Rev5 authorisations with no OSCAL submissions at all.
+  A format whose own mandate is not producing submissions is not a bandwagon
+  with a queue.
+
+decision: >
+  Do not adopt OSCAL structure. Record the correspondence in this decision so
+  that alignment later is a mapping exercise rather than an excavation: Signal
+  corresponds to an assessment-results observation, a control mapping file
+  corresponds to a component definition's control implementation, and the OSCAL
+  Mapping Model does not correspond to anything here. Revisit when an adopter
+  asks, or when a consumer of this format needs to feed an OSCAL pipeline.
+
+options:
+  - name: Document the correspondence, adopt nothing
+    chosen: true
+  - name: Restructure mapping files as OSCAL component definitions
+    rejected_because: >
+      It imposes UUIDs, required scaffolding and a document model on a file
+      whose main virtue is that an engineer can read it in a text editor and
+      argue with it. Nobody has asked, and the change would be paid for by every
+      reader in exchange for a compatibility nobody is currently consuming.
+  - name: Align with the OSCAL Mapping Model
+    rejected_because: >
+      It maps controls to controls. Signal types are observations, not controls,
+      so this would misuse the model and produce mappings an OSCAL consumer
+      would read as claims about control equivalence.
+  - name: Emit OSCAL assessment results from signals
+    rejected_because: >
+      Genuinely useful and out of scope here: it is an implementation concern
+      for a consumer, and DL-0001 puts consumers in their own repositories. The
+      correspondence recorded above is what such a consumer would need.
+  - name: Declare OSCAL irrelevant
+    rejected_because: >
+      It is the only machine-readable control format with an authority behind
+      it, and an adopter subject to FedRAMP would need the bridge. The
+      correspondence is worth keeping current even while unused.
+
+consequences:
+  positive:
+    - Mapping files stay readable and arguable, which is what makes an auditor engage with them.
+    - The bridge is documented, so building it later costs a mapping rather than a rediscovery.
+    - No dependency on a format whose adoption is currently notional.
+  negative:
+    - An adopter already invested in OSCAL gets no interoperability today and has to write the bridge themselves.
+    - The recorded correspondence is untested, and untested mappings are usually wrong somewhere.
+    - Deciding not to align is easy to keep re-deciding; the review date exists to force the question rather than let it drift.
+
+relations:
+  depends_on: [DL-0001]
+
+controls:
+  - framework: iso27001:2022
+    control: A.5.31
+    relationship: relates_to
+
+provenance:
+  extracted_from: manual
+  extracted_at: 2026-07-25

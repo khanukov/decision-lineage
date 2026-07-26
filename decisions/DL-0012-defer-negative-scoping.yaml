@@ -1,0 +1,49 @@
+# Dogfooding: decisions about this specification use this specification.
+id: DL-0012
+title: Defer negative scoping, with no evidence either way
+status: accepted
+date_decided: 2026-07-25
+review_by: 2027-01-25
+deciders: [maintainer]
+
+scope:
+  repositories: [decision-lineage]
+
+context: >
+  SPEC 7 asked whether `scope` should support exclusions — "all services except
+  these". Across every record written so far, in this repository and in the
+  examples, no decision has wanted one. That is weak evidence: the corpus is
+  small and written by one person, and an organisation with two hundred
+  services would meet the case on its first org-wide policy decision.
+
+decision: >
+  No change. `scope` stays positive-only. The question is recorded as deferred
+  for want of evidence rather than answered, and the first adopter who needs an
+  exclusion is the trigger to revisit.
+
+options:
+  - name: Defer until an adopter needs it
+    chosen: true
+  - name: Add exclusions now
+    rejected_because: >
+      A field added before anyone needs it is a field nobody fills, and
+      CONTRIBUTING treats arguing for removal as equal in value to arguing for
+      addition. Adding on speculation is how that debt accumulates.
+  - name: Rule it out permanently
+    rejected_because: >
+      The use case is plausible and the absence of evidence is a property of a
+      corpus with one author, not of the problem.
+
+consequences:
+  positive:
+    - No speculative field.
+  negative:
+    - An organisation-wide decision with two exceptions currently has to be written as an unscoped record plus prose, or as several scoped records that will drift.
+    - This will surface as a complaint rather than as a design, which is a worse way to learn it.
+
+relations:
+  depends_on: [DL-0001]
+
+provenance:
+  extracted_from: manual
+  extracted_at: 2026-07-25

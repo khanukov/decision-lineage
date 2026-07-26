@@ -1,0 +1,16 @@
+# SPEC 3.3 -- predicted is required when matched_prediction is present.
+# A bare verdict says a prediction failed without saying which, and a record
+# listing four consequences cannot afterwards be read to learn which one.
+id: DL-9130
+title: Move session storage to the shared cache
+status: accepted
+decision: Sessions move to the shared cache tier.
+consequences:
+  positive:
+    - Session reads stop hitting the primary database.
+  negative:
+    - Cache eviction now affects logged-in users.
+outcomes:
+  - date: 2026-06-30
+    observation: A cache upgrade caused a mass logout.
+    matched_prediction: false

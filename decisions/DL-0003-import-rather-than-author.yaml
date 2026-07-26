@@ -70,14 +70,20 @@ outcomes:
       the specification rather than the tool: both acquisitions numbered their
       ADRs from one and collided under a shared prefix, which 2.3 had not
       addressed because it never said what bounds a namespace.
+    predicted: >-
+      Import exercises the schema against real-world ADRs, which is where a format
+      finds its gaps.
     matched_prediction: true
   - date: 2026-07-25
     observation: >
-      "Parsing prose is heuristic, and dialects that deviate will import poorly"
-      is unverified. Only four dialects have been tried, all of them written for
-      the purpose. No real repository has been imported, so the prediction most
-      likely to be wrong is the one with no evidence either way.
-    matched_prediction: false
+      Unverified. Only four dialects have been tried, all of them written for the
+      purpose, and no real repository has been imported. The prediction most
+      likely to be wrong is the one with no evidence either way. Recorded with no
+      matched_prediction deliberately: the honest state is not that the
+      prediction failed but that nobody has looked, and forcing a verdict here
+      would put a false entry into every aggregate drawn from this corpus.
+    predicted: >-
+      Parsing prose is heuristic, and dialects that deviate will import poorly.
 
 provenance:
   extracted_from: manual

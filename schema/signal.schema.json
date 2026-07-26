@@ -25,6 +25,18 @@
         "ref": { "type": "string", "minLength": 1 }
       }
     },
+    "counterpart": {
+      "type": "object",
+      "required": ["kind", "ref"],
+      "additionalProperties": false,
+      "description": "The second asset in a relational observation. A person is not a permitted kind here either (SPEC 4.3).",
+      "properties": {
+        "kind": {
+          "enum": ["repository", "service", "module", "path", "pipeline", "resource", "work_item", "decision"]
+        },
+        "ref": { "type": "string", "minLength": 1 }
+      }
+    },
     "run": { "type": "string", "minLength": 1 },
     "baseline": { "type": "string", "minLength": 1 },
     "relates_to": { "type": "array", "items": { "type": "string" } },

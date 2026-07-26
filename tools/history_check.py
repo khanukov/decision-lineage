@@ -38,7 +38,12 @@ except ImportError:  # pragma: no cover - dependency guidance only
     sys.exit("PyYAML is required:  pip install pyyaml")
 
 ROOT = Path(__file__).resolve().parent.parent
-WATCHED_FIELDS = ("decision", "context", "options")
+# `consequences` is watched for a reason distinct from the other three: it holds
+# predictions, and a prediction revised once its outcome is known is how a
+# forecasting archive becomes a record of having been right all along. Appending
+# the outcome and tidying the prediction feel like one act, which is what makes
+# it worth catching mechanically.
+WATCHED_FIELDS = ("decision", "context", "options", "consequences")
 DEFAULT_PATHS = ("decisions", "examples")
 
 

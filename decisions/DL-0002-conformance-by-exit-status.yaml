@@ -79,6 +79,9 @@ outcomes:
       be a conformance case at all: it is a SHOULD NOT, so an implementation
       permitting the edit is conformant. The suite corrected the specification
       rather than merely testing it.
+    predicted: >-
+      Normative rules acquire a fixture, so vague MUSTs get caught while writing
+      them.
     matched_prediction: true
   - date: 2026-07-25
     observation: >
@@ -87,6 +90,9 @@ outcomes:
       rejected for the wrong reason, with a subject.kind violation never reached.
       The suite passes and the fixtures are named around the defect, which is the
       workaround the prediction implied without naming.
+    predicted: >-
+      Exit status carries no diagnosis, so a failing case says what broke and not
+      why.
     matched_prediction: true
 
 provenance:

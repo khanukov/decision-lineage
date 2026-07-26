@@ -1,0 +1,53 @@
+# Dogfooding: decisions about this specification use this specification.
+id: DL-0008
+title: Keep relations boolean rather than weighted
+status: accepted
+date_decided: 2026-07-25
+review_by: 2027-07-25
+deciders: [maintainer]
+
+scope:
+  repositories: [decision-lineage]
+
+context: >
+  SPEC 7 asked whether relations should carry weights or confidence. The
+  question came from a real intuition: some dependencies are load-bearing and
+  some are incidental, and a reader walking a chain cannot tell which. Building
+  the transitive walk in tools/lineage.py was the test, and it needed nothing
+  beyond presence. Depth in the chain already carries the signal a weight would
+  have carried, and it is derived rather than asserted.
+
+decision: >
+  Relations stay boolean. An edge exists or it does not.
+
+options:
+  - name: Boolean edges
+    chosen: true
+  - name: A weight or confidence per edge
+    rejected_because: >
+      Nobody can calibrate it. A 0.7 dependency means whatever its author felt
+      that afternoon, and tooling would aggregate those numbers into rankings
+      that look quantitative and are not. This is the Goodhart failure the
+      specification avoids elsewhere by refusing to score people; scoring edges
+      is the same mistake with a different subject.
+  - name: A qualitative strength enum, as controls have
+    rejected_because: >
+      `strength` on a control mapping describes how well a signal evidences a
+      control, which is a claim about two documented things. Dependency strength
+      is a claim about a counterfactual — what would break if this were reversed
+      — and nobody knows until it is reversed.
+
+consequences:
+  positive:
+    - The graph stays trivially derivable, and inverse relations remain exact.
+    - No field invites a number that would be aggregated into a false ranking.
+  negative:
+    - A reader cannot tell a load-bearing dependency from an incidental one without reading both records.
+    - Chain depth is a crude proxy for importance and will sometimes mislead.
+
+relations:
+  depends_on: [DL-0001]
+
+provenance:
+  extracted_from: manual
+  extracted_at: 2026-07-25

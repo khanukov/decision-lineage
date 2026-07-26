@@ -1,0 +1,65 @@
+# Dogfooding: decisions about this specification use this specification.
+id: DL-0011
+title: Add counterpart for relational signals rather than making subject plural
+status: accepted
+date_decided: 2026-07-25
+review_by: 2027-07-25
+deciders: [maintainer]
+
+scope:
+  repositories: [decision-lineage]
+
+context: >
+  SPEC 7 asked whether `duplicate_effort` is a signal about two subjects, and
+  whether the single-subject model was therefore wrong. It is, and several
+  reference types share the problem: an architecture violation is one module
+  reaching into another, temporal coupling is two components changing together,
+  and duplicated effort is two work items overlapping. Recorded against one
+  subject, each loses the half that makes it actionable — a signal saying
+  PLAT-2231 duplicates something is not a finding anyone can dispose of.
+
+decision: >
+  Add an optional `counterpart` with the same shape and the same permitted kinds
+  as `subject`. The person prohibition applies identically. A relational
+  observation is recorded once, not mirrored.
+
+options:
+  - name: An optional `counterpart` beside `subject`
+    chosen: true
+  - name: Make `subject` an array
+    rejected_because: >
+      Breaking for every existing record and every implementation, and it makes
+      the common case — one asset — carry the syntax of the rare one. It also
+      doubles the surface the person prohibition has to cover without making the
+      prohibition any clearer.
+  - name: Emit two mirrored signals and link them
+    rejected_because: >
+      `relates_to` points at Decision Records, so signal-to-signal linking would
+      need its own field. Worse, two records of one fact disagree the moment one
+      is dispositioned and the other is not.
+  - name: Remove `duplicate_effort` from the reference types
+    rejected_because: >
+      It would remove the symptom and leave the defect: architecture violations
+      and temporal coupling are relational too, and both stay in the list.
+
+consequences:
+  positive:
+    - Relational observations are expressible and disposable as one finding.
+    - The prohibition on persons is enforced in both fields by the same enumeration, so there is no second door.
+  negative:
+    - A consumer that reads only `subject` silently sees half of every relational signal, and nothing in a single record signals that it should look further.
+    - Two optional asset fields invite a third, and the model has no principled place to stop.
+
+relations:
+  depends_on: [DL-0001]
+
+evidence:
+  paths:
+    - SPEC.md
+    - schema/signal.schema.json
+    - conformance/valid/signal-counterpart.yaml
+    - conformance/invalid/signal-counterpart-is-person.yaml
+
+provenance:
+  extracted_from: manual
+  extracted_at: 2026-07-25

@@ -60,6 +60,7 @@ outcomes:
     observation: >
       Two ingestion-path bugs that would have produced orphaned property_links
       were rejected by the database constraint before reaching production.
+    predicted: Constraint enforcement moves to a single place.
     matched_prediction: true
 
 provenance:
