@@ -44,6 +44,18 @@ consequences:
     - Nothing runs, so nothing demonstrates value on day one.
     - Adoption is slower and harder to measure than downloads.
 
+outcomes:
+  - date: 2026-07-25
+    observation: >
+      The predicted cost arrived, larger than predicted. "Nothing runs, so nothing
+      demonstrates value on day one" held so firmly that six tools were added in
+      the weeks after — a validator, a conformance runner, an ADR importer, a
+      question-set lock, a history check and a lineage query tool — each argued
+      for individually and each eroding the decision a little further. DL-0006
+      then admitted a methodology, and DL-0007 an external module. The boundary
+      held in letter: no consumer product lives here. It did not hold in spirit.
+    matched_prediction: true
+
 provenance:
   extracted_from: manual
   extracted_at: 2026-07-25

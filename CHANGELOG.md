@@ -53,7 +53,21 @@ Initial draft. Nothing here is stable.
   relation to whichever record loaded first.
 
 ### Changed
+- SPEC.md §2.3 now says what bounds a namespace — the set of records a consumer
+  loads together — and what follows: producers importing from an external source
+  should derive the identifier prefix from `origin_source`, and consumers loading
+  several corpora should refuse to resolve relations when identifiers collide.
+  The rule was previously stated against an undefined term.
+- `tools/adr_import.py` derives the identifier prefix from `--origin-source` when
+  importing inherited records, instead of using `DL-` for everything. Two
+  acquisitions each numbering their ADRs from one previously collided, which is
+  the normal case for an acquiring group rather than an edge case. Own decisions
+  still default to `DL-`; `--id-prefix` overrides either.
 - SPEC.md §6 now defines how conformance is checked and what it does not cover.
+- `decisions/DL-0001`, `DL-0002` and `DL-0003` carry `outcomes` recording what
+  actually happened, including one prediction that has no evidence either way and
+  is marked as not held. Appending outcomes to an accepted record is permitted by
+  §2.5 and is the only feedback mechanism the model has.
 - GOVERNANCE.md: the trigger for broadening governance pointed the wrong way —
   neutrality now precedes adoption instead of waiting for it. Adds a committer
   process, a stated bus factor of one, and a time-bound commitment to seek a
