@@ -15,6 +15,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # The commit-message step below walks base..head, which is not present
+          # in the default shallow clone.
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
