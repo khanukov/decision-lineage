@@ -381,6 +381,12 @@ def derive_id(path: Path, prefix: str) -> str:
     return f"{prefix}{slug}"
 
 
+def derive_prefix(origin_source: str) -> str:
+    """Turn an origin source into an identifier prefix (SPEC 2.3)."""
+    slug = re.sub(r"[^A-Za-z0-9]+", "-", origin_source).strip("-").upper()
+    return f"{slug}-" if slug else "DL-"
+
+
 def slugify(text: str) -> str:
     slug = re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")
     return slug[:60] or "record"
@@ -501,7 +507,14 @@ def main() -> int:
     )
     parser.add_argument("source", help="directory containing ADR markdown files, or a single file")
     parser.add_argument("--out", help="directory to write records into; omit to print to stdout")
-    parser.add_argument("--id-prefix", default="DL-", help="identifier prefix (default: DL-)")
+    parser.add_argument(
+        "--id-prefix",
+        help=(
+            "identifier prefix. Defaults to DL- for your own decisions, and to a prefix "
+            "derived from --origin-source for inherited ones, so that two acquisitions "
+            "each numbering from one do not collide (SPEC 2.3)"
+        ),
+    )
     parser.add_argument("--report", action="store_true", help="summarise what was extracted, write nothing")
     parser.add_argument(
         "--origin",
@@ -523,6 +536,18 @@ def main() -> int:
     if arguments.origin_source and not arguments.origin:
         sys.exit("--origin-source requires --origin inherited")
 
+    id_prefix = arguments.id_prefix
+    if id_prefix is None:
+        if arguments.origin == "inherited":
+            # SPEC 2.3: two acquisitions each numbering their ADRs from one will
+            # collide under a shared prefix, and the collision surfaces later as a
+            # relation quietly resolving to the wrong record.
+            id_prefix = derive_prefix(arguments.origin_source)
+            print(f"Deriving identifier prefix {id_prefix!r} from --origin-source.", file=sys.stderr)
+            print("Pass --id-prefix to override.", file=sys.stderr)
+        else:
+            id_prefix = "DL-"
+
     source = Path(arguments.source)
     if source.is_file():
         paths = [source]
@@ -535,7 +560,7 @@ def main() -> int:
         sys.exit(f"no ADR markdown files found in {source}")
 
     imported = [
-        convert(path, arguments.id_prefix, arguments.origin, arguments.origin_source) for path in paths
+        convert(path, id_prefix, arguments.origin, arguments.origin_source) for path in paths
     ]
 
     if arguments.report:

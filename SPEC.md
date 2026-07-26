@@ -25,6 +25,12 @@ It does not define transport, storage, query interfaces, or detection algorithms
 
 **2.3 Identifiers.** Every record *MUST* carry an `id` that is unique and stable within its namespace and *MUST NOT* be reused after deletion. The reference convention is `DL-` followed by a zero-padded integer, but any stable string is permitted.
 
+**A namespace is the set of records a consumer loads together.** The specification defines no namespace declaration, because the boundary is a property of use rather than of any file: the same record can belong to one organisation's corpus and to a merged corpus spanning several.
+
+The consequence is a rule for producers. Records originating from different organisations *MUST NOT* be given colliding identifiers if there is any prospect of their corpora being read together — which, for an acquiring group, is the entire point of collecting them. Two acquired companies each numbering their decisions from one is the normal case, not an edge case, so a producer importing records from an external source *SHOULD* derive the identifier prefix from `origin_source` rather than using the reference convention for everything.
+
+Consumers cannot detect this reliably from one record, so a consumer loading multiple corpora *SHOULD* refuse to resolve relations when identifiers collide rather than binding a relation to whichever record it loaded first. A relation resolved to the wrong record produces a confident answer to a question nobody asked, which is worse than an error.
+
 **2.4 Dates.** All dates *MUST* be ISO 8601. Date-only precision is sufficient for decisions; timestamps are required for signals.
 
 **2.5 Immutability of accepted decisions.** Once a Decision Record has `status: accepted`, its `decision`, `context`, and `options` fields *SHOULD NOT* be edited to reflect a change of position. A changed position is a new record that `supersedes` the old one. Editing to correct errors, add `evidence`, or append `outcomes` is expected and permitted.
