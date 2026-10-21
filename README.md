@@ -4,6 +4,41 @@ An open specification for engineering decision lineage — linking architectural
 
 **Status: `v0.1.0-draft`.** Unstable. Breaking changes are expected. Nothing here is a standard yet; it is a proposal looking for critique.
 
+## See it work
+
+Import existing ADRs, validate the resulting records, then inspect decision
+dependencies, overdue reviews, and control relationships using bundled data:
+
+```bash
+git clone https://github.com/khanukov/decision-lineage.git
+cd decision-lineage
+python3 -m venv .venv
+.venv/bin/python -m pip install pyyaml jsonschema
+.venv/bin/python tools/demo.py
+```
+
+On Windows, use `.venv\Scripts\python.exe` in place of `.venv/bin/python`.
+After cloning, only dependency installation requires network access. The demo uses no
+credentials or model API, leaves the source files unchanged, and removes its
+temporary imports when it finishes. Import warnings are intentional: the sample
+ADRs include missing justification and ambiguous status, and imported records
+remain unreviewed candidates.
+
+One dependency query over this project's maintained decisions produces:
+
+```text
+What DL-0007 rests on
+  DL-0007  Keep the Backstage module outside this repository, and stop claiming a native producer is close
+
+    DL-0005  [accepted]  Distribute the tooling as a GitHub Action, and defer publishing a package
+      DL-0003  [accepted]  Enter the format by importing existing ADRs rather than by authoring records
+```
+
+The demo queries the project decisions and illustrative examples separately;
+they are different namespaces. The review query uses a fixed date so its output
+does not change with the day you run it. Control relationships are recorded
+claims, not an independent assessment of compliance.
+
 ---
 
 ## The problem

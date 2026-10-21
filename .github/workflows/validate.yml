@@ -55,6 +55,19 @@ jobs:
           python3 tools/lineage.py
           python3 tools/lineage.py --path examples --controls
 
+  demo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pyyaml jsonschema
+      - name: Run the README demo from outside the checkout
+        run: |
+          cd "$RUNNER_TEMP"
+          python3 "$GITHUB_WORKSPACE/tools/demo.py"
+
   importer:
     runs-on: ubuntu-latest
     steps:
